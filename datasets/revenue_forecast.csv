@@ -1,0 +1,17 @@
+merchant_id,forecast_month,predicted_revenue
+
+M0001,Month+1,793455
+M0001,Month+2,797654
+M0001,Month+3,801853
+
+M0002,Month+1,650000
+M0002,Month+2,670000
+M0002,Month+3,690000
+
+M0003,Month+1,850000
+M0003,Month+2,880000
+M0003,Month+3,910000
+
+M0004,Month+1,520000
+M0004,Month+2,540000
+M0004,Month+3,560000

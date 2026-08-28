@@ -1,0 +1,9 @@
+import { Activity } from "lucide-react";
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
+const riskScores = { LOW: 1, MEDIUM: 2, HIGH: 3, CRITICAL: 4 };
+
+export default function MerchantTrendChart({ trend, loading, error }) {
+  const data = (trend?.dates || []).map((date, index) => ({ date, risk: riskScores[trend?.risk_levels?.[index]] || 0, riskLevel: trend?.risk_levels?.[index] || "Unknown", decision: trend?.decisions?.[index] || "—" }));
+  return <section className="panel trend-panel"><div className="panel-heading"><div><p className="eyebrow">RISK SIGNAL</p><h2>Merchant risk progression</h2></div><Activity className="heading-icon" size={21} /></div>{loading && <p className="section-status">Loading merchant trend...</p>}{error && <p className="section-error">{error}</p>}{!loading && !error && data.length === 0 && <p className="empty-state">No trend data is available for this merchant.</p>}{!loading && !error && data.length > 0 && <ResponsiveContainer width="100%" height={285}><LineChart data={data} margin={{ top: 20, right: 20, left: -18, bottom: 8 }}><CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,.09)" vertical={false} /><XAxis dataKey="date" tick={{ fill: "#a6a4b9", fontSize: 10 }} axisLine={false} tickLine={false} /><YAxis domain={[1, 4]} ticks={[1, 2, 3, 4]} tickFormatter={(value) => ["Low", "Medium", "High", "Critical"][value - 1]} tick={{ fill: "#a6a4b9", fontSize: 10 }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: "#161829", border: "1px solid #393653", borderRadius: 10 }} labelStyle={{ color: "#fff" }} formatter={(value, _, item) => [item.payload.riskLevel, "Risk level"]} /><Legend formatter={() => "Risk trajectory"} /><Line type="monotone" dataKey="risk" stroke="#a99dff" strokeWidth={3} dot={{ r: 5, fill: "#a99dff" }} activeDot={{ r: 7 }} /></LineChart></ResponsiveContainer>}</section>;
+}

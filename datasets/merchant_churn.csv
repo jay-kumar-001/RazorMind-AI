@@ -1,0 +1,501 @@
+merchant_id,churn_probability,churn_risk_level,inactive_days,revenue_decline_pct,reorder_drop_pct,support_tickets_open,churn_driver,retention_recommendation
+M0001,0.4379,MEDIUM,41,39.42,33.83,9,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0002,0.2127,LOW,25,23.21,26.61,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0003,0.5376,MEDIUM,52,54.97,43.1,13,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0004,0.3798,MEDIUM,36,35.76,25.74,7,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0005,0.0868,LOW,9,11.95,8.59,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0006,0.6364,HIGH,75,58.61,44.72,15,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0007,0.2423,LOW,30,19.74,18.69,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0008,0.3711,MEDIUM,34,35.0,33.88,7,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0009,0.5195,MEDIUM,67,52.08,29.49,11,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0010,0.4526,MEDIUM,39,40.14,36.43,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0011,0.1566,LOW,24,20.84,20.3,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0012,0.5043,MEDIUM,46,48.39,32.18,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0013,0.0322,LOW,16,2.79,4.83,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0014,0.409,MEDIUM,47,39.26,30.94,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0015,0.3036,MEDIUM,42,23.9,19.43,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0016,0.3267,MEDIUM,35,27.53,19.99,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0017,0.2859,MEDIUM,18,19.88,19.83,3,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0018,0.3265,MEDIUM,40,31.37,27.96,9,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0019,0.0732,LOW,20,9.11,3.99,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0020,0.0209,LOW,17,1.05,9.88,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0021,0.5142,MEDIUM,56,46.87,41.66,9,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0022,0.1903,LOW,18,11.13,18.12,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0023,0.1577,LOW,26,13.16,9.8,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0024,0.4865,MEDIUM,50,46.62,40.83,10,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0025,0.6462,HIGH,67,54.18,39.25,12,Elevated Return/Refund Volume,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0026,0.02,LOW,13,7.28,1.94,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0027,0.15,LOW,16,19.18,16.36,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0028,0.1623,LOW,26,13.34,14.71,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0029,0.1659,LOW,15,16.35,11.95,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0030,0.0363,LOW,18,2.76,1.99,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0031,0.5823,MEDIUM,61,53.73,39.83,12,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0032,0.5322,MEDIUM,56,51.46,38.38,13,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0033,0.5207,MEDIUM,49,44.48,30.68,12,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0034,0.2161,LOW,26,18.91,19.45,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0035,0.2727,MEDIUM,23,18.31,22.37,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0036,0.0463,LOW,13,13.31,11.67,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0037,0.2992,MEDIUM,29,26.43,26.01,5,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0038,0.0469,LOW,9,8.96,0.0,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0039,0.1267,LOW,11,10.61,11.82,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0040,0.11,LOW,12,12.32,9.86,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0041,0.2007,LOW,17,16.73,19.58,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0042,0.2223,LOW,23,15.24,18.63,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0043,0.0895,LOW,11,8.14,0.75,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0044,0.2566,MEDIUM,27,25.85,21.3,5,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0045,0.3797,MEDIUM,40,28.92,32.31,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0046,0.1105,LOW,17,7.76,9.81,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0047,0.02,LOW,19,10.9,1.92,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0048,0.1698,LOW,19,17.33,18.02,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0049,0.0979,LOW,14,10.38,10.77,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0050,0.2791,MEDIUM,34,28.75,25.24,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0051,0.0552,LOW,16,7.63,12.27,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0052,0.3542,MEDIUM,34,37.01,24.42,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0053,0.5145,MEDIUM,55,51.82,33.61,10,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0054,0.0817,LOW,25,9.29,14.14,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0055,0.3178,MEDIUM,31,29.61,27.33,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0056,0.2474,LOW,16,21.47,16.95,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0057,0.3319,MEDIUM,34,35.86,31.7,6,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0058,0.5487,MEDIUM,50,50.92,35.32,12,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0059,0.1033,LOW,21,10.32,7.62,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0060,0.02,LOW,12,0.76,0.51,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0061,0.2278,LOW,35,27.67,24.23,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0062,0.2214,LOW,20,17.41,18.49,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0063,0.4715,MEDIUM,57,39.36,38.4,12,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0064,0.0977,LOW,11,6.51,14.84,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0065,0.1015,LOW,10,11.16,4.93,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0066,0.1349,LOW,26,20.18,19.35,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0067,0.3911,MEDIUM,47,40.14,35.71,8,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0068,0.1872,LOW,20,16.76,13.15,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0069,0.077,LOW,15,9.24,6.27,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0070,0.4726,MEDIUM,59,51.6,39.61,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0071,0.2117,LOW,25,24.0,17.29,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0072,0.658,HIGH,76,64.24,44.45,15,Elevated Return/Refund Volume,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0073,0.1968,LOW,18,25.67,22.66,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0074,0.1238,LOW,25,14.91,19.01,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0075,0.1319,LOW,15,10.17,18.14,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0076,0.597,MEDIUM,53,52.25,42.32,12,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0077,0.1751,LOW,20,17.56,18.57,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0078,0.1615,LOW,24,14.78,21.68,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0079,0.2277,LOW,12,19.3,19.74,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0080,0.0549,LOW,6,1.43,4.78,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0081,0.1109,LOW,20,9.56,14.98,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0082,0.1089,LOW,17,12.39,17.72,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0083,0.6903,HIGH,83,62.31,37.95,13,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0084,0.3261,MEDIUM,32,30.31,25.48,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0085,0.5355,MEDIUM,65,47.94,35.52,11,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0086,0.4741,MEDIUM,42,39.5,31.89,9,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0087,0.1593,LOW,10,10.3,12.06,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0088,0.3705,MEDIUM,30,34.29,27.57,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0089,0.5116,MEDIUM,51,43.46,27.98,11,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0090,0.1,LOW,16,11.45,10.5,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0091,0.142,LOW,23,7.62,13.92,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0092,0.1184,LOW,16,17.18,11.26,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0093,0.4423,MEDIUM,41,38.25,32.21,10,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0094,0.2558,MEDIUM,26,22.78,20.65,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0095,0.0704,LOW,19,3.53,4.88,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0096,0.1042,LOW,17,1.6,4.38,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0097,0.1827,LOW,21,10.21,8.51,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0098,0.2142,LOW,26,22.59,15.69,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0099,0.2222,LOW,15,23.61,19.75,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0100,0.4248,MEDIUM,34,37.59,26.59,7,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0101,0.231,LOW,15,18.84,22.43,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0102,0.6655,HIGH,76,61.3,49.67,14,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0103,0.4852,MEDIUM,50,43.54,28.16,7,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0104,0.1984,LOW,17,18.17,17.91,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0105,0.196,LOW,27,18.04,24.3,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0106,0.3947,MEDIUM,40,31.19,33.23,9,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0107,0.4523,MEDIUM,46,35.33,32.97,9,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0108,0.4806,MEDIUM,52,46.95,39.1,12,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0109,0.1077,LOW,21,7.22,11.37,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0110,0.5288,MEDIUM,55,52.46,34.54,13,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0111,0.3646,MEDIUM,31,32.24,37.32,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0112,0.5758,MEDIUM,60,51.44,41.69,13,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0113,0.3725,MEDIUM,34,34.93,37.34,9,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0114,0.3473,MEDIUM,41,39.95,32.81,8,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0115,0.0862,LOW,12,3.66,3.51,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0116,0.2166,LOW,15,21.63,19.87,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0117,0.3395,MEDIUM,39,35.45,29.53,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0118,0.1629,LOW,24,18.36,16.16,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0119,0.1825,LOW,11,10.63,12.91,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0120,0.2039,LOW,19,18.28,20.43,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0121,0.674,HIGH,80,65.0,45.27,14,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0122,0.245,LOW,22,22.72,22.11,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0123,0.1117,LOW,17,11.37,13.99,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0124,0.0772,LOW,17,9.71,7.91,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0125,0.2264,LOW,37,24.37,24.46,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0126,0.202,LOW,14,18.66,18.15,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0127,0.4501,MEDIUM,41,38.51,33.38,6,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0128,0.5048,MEDIUM,51,46.04,33.47,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0129,0.2243,LOW,18,20.53,18.32,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0130,0.4894,MEDIUM,61,44.75,37.68,10,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0131,0.3734,MEDIUM,34,36.65,30.55,8,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0132,0.1826,LOW,19,19.42,18.04,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0133,0.02,LOW,16,-0.08,4.87,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0134,0.1574,LOW,17,6.01,7.28,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0135,0.3186,MEDIUM,31,31.38,32.21,7,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0136,0.4807,MEDIUM,48,46.17,32.21,12,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0137,0.0947,LOW,9,5.06,4.83,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0138,0.1965,LOW,18,16.98,18.84,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0139,0.3824,MEDIUM,45,40.57,34.97,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0140,0.563,MEDIUM,66,50.44,32.2,14,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0141,0.5195,MEDIUM,60,51.07,39.66,13,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0142,0.3887,MEDIUM,30,33.13,30.64,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0143,0.3793,MEDIUM,29,32.95,30.12,9,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0144,0.3339,MEDIUM,40,36.86,27.0,7,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0145,0.0876,LOW,16,10.72,3.62,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0146,0.4476,MEDIUM,37,42.53,33.38,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0147,0.3433,MEDIUM,39,31.76,29.34,7,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0148,0.0813,LOW,23,10.28,8.98,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0149,0.2973,MEDIUM,39,30.65,23.08,8,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0150,0.2496,LOW,30,19.63,22.54,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0151,0.199,LOW,25,13.69,17.04,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0152,0.152,LOW,14,11.5,12.8,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0153,0.4235,MEDIUM,36,35.39,31.13,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0154,0.0297,LOW,15,9.71,8.45,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0155,0.1457,LOW,12,9.33,12.37,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0156,0.2536,MEDIUM,17,16.59,23.51,5,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0157,0.2005,LOW,17,12.73,20.1,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0158,0.3761,MEDIUM,30,30.49,36.88,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0159,0.2347,LOW,24,15.55,23.53,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0160,0.4189,MEDIUM,41,36.3,33.22,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0161,0.1526,LOW,19,19.3,12.71,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0162,0.3463,MEDIUM,34,29.36,27.11,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0163,0.2923,MEDIUM,31,32.76,23.52,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0164,0.2563,MEDIUM,26,24.77,21.37,5,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0165,0.2287,LOW,24,19.64,14.86,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0166,0.1966,LOW,14,11.67,15.28,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0167,0.6228,HIGH,59,51.76,44.31,14,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0168,0.1309,LOW,12,10.6,8.67,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0169,0.284,MEDIUM,31,21.61,17.19,8,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0170,0.2633,MEDIUM,35,27.65,20.15,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0171,0.0434,LOW,10,6.27,0.69,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0172,0.459,MEDIUM,32,34.85,30.51,8,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0173,0.2076,LOW,25,20.07,12.25,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0174,0.1389,LOW,19,13.41,20.73,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0175,0.2361,LOW,37,29.42,21.6,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0176,0.2292,LOW,30,26.94,16.42,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0177,0.0226,LOW,9,8.66,1.16,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0178,0.7112,HIGH,83,60.69,48.65,14,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0179,0.4541,MEDIUM,44,38.22,28.78,8,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0180,0.5493,MEDIUM,62,51.73,37.77,11,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0181,0.0383,LOW,12,6.36,9.05,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0182,0.073,LOW,9,7.19,2.51,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0183,0.2029,LOW,24,14.59,22.43,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0184,0.2336,LOW,37,30.69,25.17,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0185,0.1167,LOW,22,7.77,13.95,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0186,0.0793,LOW,22,16.04,10.48,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0187,0.2047,LOW,28,26.76,25.62,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0188,0.23,LOW,14,16.66,16.73,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0189,0.4363,MEDIUM,40,39.42,35.35,9,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0190,0.5075,MEDIUM,59,53.03,41.53,14,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0191,0.5425,MEDIUM,57,48.9,39.41,13,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0192,0.3305,MEDIUM,42,29.87,19.32,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0193,0.2248,LOW,23,20.98,21.34,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0194,0.1809,LOW,25,21.07,15.18,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0195,0.5768,MEDIUM,59,48.04,46.07,11,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0196,0.0923,LOW,20,13.57,13.55,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0197,0.4935,MEDIUM,59,42.92,34.88,11,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0198,0.2934,MEDIUM,26,25.19,24.58,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0199,0.3391,MEDIUM,41,35.66,26.33,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0200,0.6637,HIGH,75,59.11,43.88,15,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0201,0.1637,LOW,18,14.88,10.24,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0202,0.1546,LOW,14,17.82,16.91,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0203,0.5837,MEDIUM,50,50.17,43.23,12,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0204,0.3262,MEDIUM,37,34.71,31.65,6,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0205,0.0772,LOW,17,1.18,0.47,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0206,0.6872,HIGH,76,58.38,39.63,15,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0207,0.0438,LOW,21,8.8,6.53,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0208,0.2652,MEDIUM,16,19.47,17.47,2,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0209,0.19,LOW,27,18.58,16.2,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0210,0.2266,LOW,17,20.86,19.0,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0211,0.225,LOW,21,24.01,16.82,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0212,0.4725,MEDIUM,57,42.9,33.92,12,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0213,0.577,MEDIUM,58,52.05,35.08,13,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0214,0.1522,LOW,11,14.72,9.92,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0215,0.2273,LOW,20,20.67,20.8,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0216,0.0277,LOW,14,13.23,2.48,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0217,0.4196,MEDIUM,44,35.27,31.01,10,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0218,0.3334,MEDIUM,35,33.62,21.4,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0219,0.1713,LOW,16,11.47,9.98,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0220,0.3768,MEDIUM,40,32.87,34.85,9,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0221,0.0226,LOW,21,6.34,4.62,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0222,0.1395,LOW,13,10.95,8.33,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0223,0.1843,LOW,20,19.3,19.03,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0224,0.6568,HIGH,83,63.95,40.48,16,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0225,0.4626,MEDIUM,50,46.9,30.21,9,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0226,0.1184,LOW,15,10.67,16.99,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0227,0.0754,LOW,21,5.11,4.53,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0228,0.3189,MEDIUM,32,31.05,19.76,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0229,0.0306,LOW,15,8.09,9.2,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0230,0.205,LOW,21,15.45,12.63,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0231,0.3193,MEDIUM,43,33.25,29.76,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0232,0.3949,MEDIUM,45,40.71,32.82,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0233,0.1555,LOW,15,15.79,10.8,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0234,0.4335,MEDIUM,38,35.13,30.29,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0235,0.1363,LOW,20,7.84,10.51,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0236,0.5103,MEDIUM,53,49.46,41.21,10,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0237,0.1927,LOW,27,16.23,20.78,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0238,0.4265,MEDIUM,42,39.57,37.92,7,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0239,0.4777,MEDIUM,50,42.56,38.08,9,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0240,0.566,MEDIUM,66,52.94,37.36,14,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0241,0.2599,MEDIUM,33,30.91,25.25,7,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0242,0.6391,HIGH,77,60.82,46.93,14,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0243,0.317,MEDIUM,40,29.71,21.79,7,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0244,0.4355,MEDIUM,40,37.25,27.67,8,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0245,0.0883,LOW,14,9.27,3.44,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0246,0.1977,LOW,20,18.64,13.09,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0247,0.6732,HIGH,73,60.74,43.58,14,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0248,0.3356,MEDIUM,44,35.29,32.42,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0249,0.2413,LOW,17,20.03,13.08,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0250,0.2034,LOW,17,11.22,17.39,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0251,0.209,LOW,17,10.46,14.03,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0252,0.0674,LOW,21,11.54,10.14,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0253,0.1485,LOW,15,6.97,14.93,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0254,0.4862,MEDIUM,57,43.44,38.0,11,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0255,0.054,LOW,18,12.74,12.01,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0256,0.1813,LOW,20,18.81,18.62,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0257,0.2692,MEDIUM,27,26.83,26.18,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0258,0.2444,LOW,39,28.6,20.4,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0259,0.0866,LOW,8,6.44,2.53,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0260,0.3325,MEDIUM,35,32.28,26.11,8,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0261,0.2486,LOW,40,28.21,25.13,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0262,0.1614,LOW,13,17.53,9.48,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0263,0.2496,LOW,20,24.17,24.58,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0264,0.6508,HIGH,80,56.97,45.57,14,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0265,0.1521,LOW,15,12.56,11.84,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0266,0.0486,LOW,15,8.92,9.38,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0267,0.156,LOW,19,18.99,19.2,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0268,0.2147,LOW,17,17.53,23.16,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0269,0.3646,MEDIUM,40,29.12,30.42,6,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0270,0.1225,LOW,19,15.12,7.43,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0271,0.6221,HIGH,70,50.59,41.42,12,Checkout Funnel Friction,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0272,0.1078,LOW,8,12.24,4.96,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0273,0.3635,MEDIUM,39,31.96,27.49,9,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0274,0.1819,LOW,21,9.13,12.21,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0275,0.2989,MEDIUM,33,25.71,26.72,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0276,0.4081,MEDIUM,36,41.41,36.02,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0277,0.0741,LOW,21,14.55,15.75,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0278,0.3606,MEDIUM,41,34.22,27.01,7,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0279,0.0418,LOW,10,10.41,5.28,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0280,0.1677,LOW,14,15.11,22.02,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0281,0.6154,HIGH,54,50.39,43.66,13,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0282,0.1957,LOW,23,20.73,16.21,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0283,0.2858,MEDIUM,20,21.91,25.33,6,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0284,0.185,LOW,15,20.17,20.68,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0285,0.1201,LOW,14,16.21,6.46,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0286,0.6146,HIGH,60,59.04,44.52,12,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0287,0.1695,LOW,22,24.01,17.58,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0288,0.1158,LOW,24,15.13,10.3,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0289,0.6987,HIGH,69,60.65,46.92,16,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0290,0.1568,LOW,17,15.73,15.89,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0291,0.1062,LOW,18,15.08,16.31,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0292,0.307,MEDIUM,36,31.83,28.33,8,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0293,0.2878,MEDIUM,39,26.64,18.35,6,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0294,0.3975,MEDIUM,37,39.13,30.45,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0295,0.2109,LOW,14,20.56,14.23,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0296,0.104,LOW,20,12.75,8.76,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0297,0.5606,MEDIUM,60,55.58,46.07,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0298,0.3428,MEDIUM,40,29.55,24.21,9,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0299,0.5126,MEDIUM,50,51.74,40.81,11,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0300,0.2701,MEDIUM,27,18.57,17.36,5,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0301,0.1685,LOW,17,19.66,15.49,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0302,0.3459,MEDIUM,41,32.35,29.44,7,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0303,0.4273,MEDIUM,38,36.95,26.57,9,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0304,0.3267,MEDIUM,41,29.58,25.23,5,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0305,0.0951,LOW,21,10.97,9.09,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0306,0.261,MEDIUM,34,23.93,21.61,6,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0307,0.1187,LOW,15,21.26,19.41,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0308,0.4037,MEDIUM,37,38.96,29.75,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0309,0.0983,LOW,8,1.98,5.4,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0310,0.0536,LOW,16,6.15,3.45,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0311,0.4221,MEDIUM,45,41.38,27.57,10,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0312,0.2566,MEDIUM,38,30.26,22.09,8,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0313,0.1024,LOW,10,6.31,6.48,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0314,0.139,LOW,18,9.27,10.49,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0315,0.525,MEDIUM,55,46.82,34.51,13,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0316,0.3526,MEDIUM,38,35.95,23.26,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0317,0.086,LOW,25,8.48,12.87,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0318,0.0373,LOW,13,9.05,8.7,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0319,0.2782,MEDIUM,39,28.0,18.29,6,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0320,0.1135,LOW,21,16.16,12.85,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0321,0.0737,LOW,11,9.39,6.95,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0322,0.0947,LOW,13,9.8,10.06,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0323,0.2244,LOW,13,13.11,20.69,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0324,0.0276,LOW,20,10.93,6.55,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0325,0.1634,LOW,14,13.53,13.2,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0326,0.02,LOW,19,7.72,7.62,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0327,0.4161,MEDIUM,42,37.32,29.17,8,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0328,0.172,LOW,24,23.55,16.53,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0329,0.1653,LOW,18,15.7,19.94,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0330,0.2306,LOW,26,27.85,23.13,8,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0331,0.2545,MEDIUM,21,14.08,18.75,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0332,0.0475,LOW,14,9.76,4.15,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0333,0.2287,LOW,43,28.2,17.1,9,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0334,0.0604,LOW,16,10.13,5.73,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0335,0.3882,MEDIUM,38,39.4,32.66,9,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0336,0.1145,LOW,21,10.32,12.09,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0337,0.059,LOW,14,1.97,1.55,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0338,0.0767,LOW,15,8.2,13.27,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0339,0.1337,LOW,12,8.33,17.58,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0340,0.2397,LOW,21,16.03,13.53,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0341,0.3099,MEDIUM,35,22.64,26.74,6,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0342,0.1357,LOW,17,8.93,16.09,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0343,0.3839,MEDIUM,29,32.1,30.9,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0344,0.6637,HIGH,75,61.28,43.21,15,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0345,0.3853,MEDIUM,31,33.5,29.16,8,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0346,0.0528,LOW,12,8.47,6.86,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0347,0.3858,MEDIUM,47,41.08,32.21,10,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0348,0.2073,LOW,21,15.32,23.38,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0349,0.3716,MEDIUM,43,33.67,36.16,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0350,0.4819,MEDIUM,60,46.44,32.44,11,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0351,0.0961,LOW,14,5.77,12.1,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0352,0.1831,LOW,22,16.82,16.34,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0353,0.1238,LOW,15,14.49,15.08,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0354,0.0405,LOW,8,5.82,3.47,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0355,0.2341,LOW,37,26.4,17.81,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0356,0.0928,LOW,22,9.65,10.9,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0357,0.299,MEDIUM,35,26.5,24.37,8,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0358,0.1949,LOW,13,11.24,16.92,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0359,0.0644,LOW,12,12.54,5.58,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0360,0.181,LOW,23,15.85,16.16,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0361,0.1588,LOW,18,16.59,8.43,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0362,0.5257,MEDIUM,65,49.41,33.82,13,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0363,0.1965,LOW,11,13.69,13.22,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0364,0.2327,LOW,15,24.13,23.77,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0365,0.4357,MEDIUM,47,42.69,38.65,9,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0366,0.2129,LOW,14,20.21,23.24,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0367,0.224,LOW,27,22.66,22.76,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0368,0.1862,LOW,18,22.43,17.51,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0369,0.4512,MEDIUM,35,41.62,30.23,9,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0370,0.0431,LOW,10,8.04,7.71,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0371,0.1992,LOW,14,18.2,20.49,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0372,0.4403,MEDIUM,50,43.42,32.85,11,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0373,0.02,LOW,16,4.31,3.36,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0374,0.5281,MEDIUM,66,48.01,39.39,11,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0375,0.156,LOW,13,8.84,13.91,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0376,0.6614,HIGH,80,55.46,39.23,14,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0377,0.0617,LOW,10,5.84,6.97,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0378,0.1556,LOW,22,11.99,6.59,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0379,0.3658,MEDIUM,38,34.94,22.72,6,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0380,0.0823,LOW,19,7.49,5.86,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0381,0.2232,LOW,20,19.35,18.88,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0382,0.0845,LOW,23,7.23,9.97,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0383,0.651,HIGH,76,60.35,42.05,15,Lack of Re-engagement Campaigns,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0384,0.0995,LOW,17,18.48,16.29,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0385,0.1957,LOW,24,18.93,16.74,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0386,0.02,LOW,7,0.51,7.75,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0387,0.0265,LOW,18,11.05,0.23,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0388,0.3018,MEDIUM,39,27.14,19.92,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0389,0.6987,HIGH,77,56.65,44.34,16,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0390,0.2183,LOW,27,17.36,22.28,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0391,0.0515,LOW,12,6.61,1.73,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0392,0.0963,LOW,17,13.86,14.61,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0393,0.2475,LOW,27,24.88,20.19,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0394,0.2148,LOW,27,21.59,15.09,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0395,0.2023,LOW,24,20.28,20.21,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0396,0.0894,LOW,20,12.91,5.83,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0397,0.5291,MEDIUM,55,41.38,35.2,12,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0398,0.1165,LOW,20,12.06,12.89,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0399,0.3548,MEDIUM,37,28.03,25.85,5,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0400,0.3142,MEDIUM,30,25.28,25.47,8,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0401,0.0818,LOW,25,9.81,11.54,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0402,0.1223,LOW,24,14.2,11.2,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0403,0.583,MEDIUM,67,57.0,36.93,12,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0404,0.2452,LOW,39,24.77,20.64,9,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0405,0.2165,LOW,23,13.06,16.53,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0406,0.274,MEDIUM,28,30.01,17.58,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0407,0.3234,MEDIUM,33,31.62,30.35,8,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0408,0.181,LOW,14,16.0,15.68,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0409,0.3071,MEDIUM,39,35.05,21.69,8,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0410,0.1363,LOW,15,11.75,11.21,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0411,0.2709,MEDIUM,38,28.53,28.67,7,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0412,0.4487,MEDIUM,47,41.53,28.52,10,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0413,0.5929,MEDIUM,58,51.96,40.35,11,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0414,0.0758,LOW,7,8.93,3.41,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0415,0.1279,LOW,10,6.31,15.25,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0416,0.0986,LOW,23,17.87,16.69,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0417,0.068,LOW,9,3.82,6.81,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0418,0.2386,LOW,22,26.67,21.07,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0419,0.1958,LOW,16,16.45,13.22,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0420,0.2416,LOW,30,23.33,28.01,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0421,0.6063,HIGH,81,59.14,36.97,14,Checkout Funnel Friction,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0422,0.3259,MEDIUM,36,23.23,23.4,7,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0423,0.3495,MEDIUM,44,31.23,20.48,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0424,0.0323,LOW,11,3.68,7.48,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0425,0.6678,HIGH,72,56.05,47.0,16,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0426,0.4686,MEDIUM,50,43.76,30.16,9,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0427,0.2869,MEDIUM,30,31.78,26.74,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0428,0.1991,LOW,16,16.31,17.54,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0429,0.6677,HIGH,68,58.49,45.36,16,Elevated Return/Refund Volume,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0430,0.5908,MEDIUM,64,45.94,39.24,11,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0431,0.1229,LOW,8,10.56,15.67,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0432,0.0532,LOW,20,8.16,5.56,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0433,0.3594,MEDIUM,39,36.77,31.28,7,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0434,0.5433,MEDIUM,64,49.78,30.43,11,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0435,0.2929,MEDIUM,39,26.42,22.31,5,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0436,0.7172,HIGH,80,65.0,48.99,14,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0437,0.0523,LOW,13,10.07,4.56,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0438,0.5858,MEDIUM,55,52.65,45.77,11,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0439,0.4199,MEDIUM,39,37.05,33.47,9,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0440,0.0839,LOW,11,3.66,8.98,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0441,0.2832,MEDIUM,23,23.95,19.14,5,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0442,0.1716,LOW,16,23.19,19.14,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0443,0.4901,MEDIUM,66,48.27,36.06,10,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0444,0.1868,LOW,25,17.79,15.51,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0445,0.5053,MEDIUM,60,46.28,31.03,11,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0446,0.0461,LOW,20,9.85,4.01,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0447,0.1578,LOW,19,21.41,21.48,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0448,0.3875,MEDIUM,40,37.36,33.1,6,Competitor Price Undercutting,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0449,0.2801,MEDIUM,24,21.85,22.25,6,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0450,0.0847,LOW,18,4.26,5.63,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0451,0.1002,LOW,13,2.38,11.73,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0452,0.109,LOW,22,4.89,9.29,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0453,0.0696,LOW,15,6.25,6.23,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0454,0.0868,LOW,21,10.27,9.08,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0455,0.1638,LOW,24,14.16,18.32,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0456,0.5198,MEDIUM,55,40.2,32.09,11,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0457,0.166,LOW,21,19.11,19.48,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0458,0.5577,MEDIUM,56,47.34,40.37,13,Product Catalog Fatigue,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0459,0.2234,LOW,21,19.97,19.87,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0460,0.0501,LOW,23,15.12,6.13,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0461,0.6657,HIGH,84,60.82,42.54,16,Seasonal Demand Drop,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0462,0.7645,HIGH,85,65.0,47.97,16,Checkout Funnel Friction,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0463,0.206,LOW,25,17.68,20.49,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0464,0.2677,MEDIUM,37,22.45,19.57,9,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0465,0.3006,MEDIUM,38,28.39,16.3,8,Elevated Return/Refund Volume,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0466,0.66,HIGH,70,57.84,42.23,16,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0467,0.2429,LOW,28,25.24,24.66,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0468,0.53,MEDIUM,47,42.7,35.14,11,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0469,0.519,MEDIUM,50,43.87,38.35,12,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0470,0.239,LOW,27,17.28,21.66,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0471,0.1726,LOW,21,18.52,11.29,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0472,0.1033,LOW,23,17.99,13.27,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0473,0.2046,LOW,35,21.64,23.33,7,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0474,0.02,LOW,13,7.31,9.27,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0475,0.0861,LOW,20,11.38,10.08,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0476,0.7123,HIGH,80,61.96,48.98,16,Competitor Price Undercutting,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0477,0.3004,MEDIUM,30,23.2,21.42,6,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0478,0.147,LOW,21,11.81,14.26,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0479,0.0887,LOW,15,4.33,4.82,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0480,0.1575,LOW,12,7.84,11.87,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0481,0.4371,MEDIUM,32,36.21,30.53,6,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0482,0.6,HIGH,56,46.98,36.69,12,Product Catalog Fatigue,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0483,0.1284,LOW,20,15.71,14.42,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0484,0.3947,MEDIUM,49,43.6,29.08,7,Checkout Funnel Friction,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0485,0.2177,LOW,30,13.77,19.28,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0486,0.2274,LOW,17,22.57,13.75,6,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0487,0.2082,LOW,20,16.82,19.07,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0488,0.2648,MEDIUM,32,27.02,20.88,9,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0489,0.394,MEDIUM,44,37.62,34.94,10,Lack of Re-engagement Campaigns,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0490,0.029,LOW,10,10.5,0.05,5,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0491,0.1245,LOW,11,4.73,5.77,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0492,0.1069,LOW,11,7.56,2.32,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0493,0.0807,LOW,15,8.58,13.0,2,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0494,0.5761,MEDIUM,54,48.73,36.55,10,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0495,0.2665,MEDIUM,30,26.82,22.55,5,Seasonal Demand Drop,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0496,0.1779,LOW,16,18.99,17.51,3,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0497,0.3793,MEDIUM,37,38.92,27.83,8,Payment Gateway Failures & Bank Latency,Enable dynamic gateway routing and launch personalized re-engagement sequence.
+M0498,0.6102,HIGH,64,55.93,44.23,11,Payment Gateway Failures & Bank Latency,"Deploy urgent automated checkout retry logic, instant WhatsApp refund notifications, and 15% win-back incentives."
+M0499,0.1654,LOW,17,9.17,6.75,1,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
+M0500,0.1554,LOW,10,10.72,14.12,4,Normal Healthy Velocity,Maintain current customer loyalty programs and test VIP tiers.
