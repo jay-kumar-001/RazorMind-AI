@@ -48,7 +48,7 @@ export default function RiskTab({ merchant }) {
   const failureRisk = Math.min(100, Math.max(0, (100 - Number(merchant.success_rate || 92)) * 3.5));
   const disputeRisk = Math.min(100, (Number(merchant.refund_rate || 1.8) * 4.5) + (Number(merchant.chargeback_rate || 0.4) * 12.0));
   const volatilityRisk = Math.min(100, (100 - Number(merchant.retention_rate || merchant.retention_score || 65)) * 0.9);
-  const churnRisk = churn ? Number(churn.churn_probability || 0.2) * 100 : 25;
+  const churnRisk = churn ? Number(churn.churn_probability ?? 20) : 25;
 
   const factors = [
     { name: "Payment Failure Risk", score: failureRisk, weight: "35%", benchmark: "< 25.0", desc: "Soft declines & bank latency" },

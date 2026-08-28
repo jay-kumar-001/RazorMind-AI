@@ -145,6 +145,7 @@ export default function ForecastTab({ merchant }) {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
+                  domain={["auto", "auto"]}
                   tick={{ fill: "var(--text-tertiary)", fontSize: 10 }}
                   tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`}
                 />

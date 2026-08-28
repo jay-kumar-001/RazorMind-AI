@@ -1,13 +1,5 @@
-# RazorMind AI ⚡🧠
+# RazorMind AI
 
-### *Enterprise Autonomous Merchant Intelligence, Risk Underwriting & Digital Twin Simulation Platform*
-
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![React](https://img.shields.io/badge/React-19.2.8-61DAFB.svg?style=flat&logo=react&logoColor=black)](https://react.dev/)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-FF6F00.svg?style=flat&logo=langchain&logoColor=white)](https://langchain-ai.github.io/langgraph/)
-[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Ready-4169E1.svg?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
@@ -19,9 +11,9 @@ Powered by a **14-agent LangGraph orchestration pipeline**, **statistical & ML f
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 1. 🤖 14-Agent LangGraph Autonomous Workflow
+### 1. 14-Agent LangGraph Autonomous Workflow
 - **Graph Orchestration**: Agents execute sequentially with structured state-passing:
   $$\text{Revenue} \rightarrow \text{Forecast} \rightarrow \text{Risk} \rightarrow \text{Churn} \rightarrow \text{KPI} \rightarrow \text{Root Cause} \rightarrow \text{Recommendation} \rightarrow \text{Decision} \rightarrow \text{Action Plan} \rightarrow \text{Executive Report}$$
 - **Multi-Tier Resilient LLM Engine**: Zero downtime guarantee with intelligent fallback:
@@ -29,39 +21,39 @@ Powered by a **14-agent LangGraph orchestration pipeline**, **statistical & ML f
   2. Cloud LLMs (OpenAI / Gemini)
   3. Deterministic High-Fidelity Heuristic Synthesis
 
-### 2. 🔮 Digital Twin Simulation Sandbox
+### 2. Digital Twin Simulation Sandbox
 - Interactive **"What-If" parameter modeling**:
   - Adjust Success Rate ($\Delta\%$), Refund Rate ($\Delta\%$), Churn Reduction ($\Delta\%$), Retention Boost ($\Delta\%$), and Volume Growth ($\Delta\%$).
 - Real-time recalculation of **Merchant Health Score (0–100)**, projected cash flows, revenue lift, and risk migration.
 
-### 3. 📈 Statistical & ML Forecasting Lab
+### 3. Statistical & ML Forecasting Lab
 - Multi-horizon forecasting (30, 60, 90, 180 days) using exponential trend smoothing and seasonal adjustments.
 - Computes **95% confidence intervals** (Low, Mid, High bounds) with trend direction and volatility metrics.
 
-### 4. 🛡️ Multi-Factor Risk & Root Cause Engine
+### 4. Multi-Factor Risk & Root Cause Engine
 - Deep risk scoring factoring in:
   - Transaction failure velocity & refund ratios
   - Customer churn propensity and retention degradation
   - Revenue volatility and customer concentration risk
 - Automated **Root Cause Pinpointing** with severity tagging (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`) and exact bottleneck evidence.
 
-### 5. 📋 Dynamic 30-Day Tactical Action Plan
+### 5. Dynamic 30-Day Tactical Action Plan
 - Generates week-by-week prioritized mitigation playbooks.
 - Tracks estimated ROI, operational checkpoints, and automated task verification.
 
-### 6. 📑 Investor-Grade Executive Reports & PDF Export
+### 6.Investor-Grade Executive Reports & PDF Export
 - Generates structured executive briefings with health badges, risk factor radar breakdowns, and governance decisions.
 - **One-Click Dynamic PDF Export** generated server-side via ReportLab.
 
-### 7. 🔬 Full Observability & Trace Telemetry
+### 7. Full Observability & Trace Telemetry
 - Real-time agent execution telemetry, execution latencies (ms), input/output payloads, and interactive LangGraph state visualizer.
 
-### 8. 💬 Merchant Copilot
+### 8. Merchant Copilot
 - Context-aware AI assistant grounded in the active merchant's real-time financial telemetry, KYC history, and risk profile.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -98,7 +90,7 @@ graph TD
 
 ---
 
-## 🤖 The 14 Specialized Agents
+## The 14 Specialized Agents
 
 | # | Agent Name | Responsibility | Primary Output |
 |---|---|---|---|
@@ -119,7 +111,7 @@ graph TD
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 ### **Frontend**
 - **Framework**: React 19 + Vite (Ultra-fast HMR)
@@ -143,7 +135,7 @@ graph TD
 
 ---
 
-## 📁 Repository Directory Structure
+## Repository Directory Structure
 
 ```text
 razormind-ai/
@@ -214,7 +206,7 @@ razormind-ai/
 
 ---
 
-## ⚡ Quickstart Guide
+## Quickstart Guide
 
 ### Prerequisites
 - **Python**: `3.10` or higher
@@ -264,8 +256,8 @@ cd razormind-ai
    ```bash
    uvicorn backend.app:app --reload --port 8000
    ```
-   > 📍 API will be running at: `http://localhost:8000`  
-   > 📚 Interactive API Docs (Swagger): `http://localhost:8000/docs`
+   > API will be running at: `http://localhost:8000`  
+   > Interactive API Docs (Swagger): `http://localhost:8000/docs`
 
 ---
 
@@ -285,11 +277,11 @@ cd razormind-ai
    ```bash
    npm run dev
    ```
-   > 🌐 Dashboard will be live at: `http://localhost:5173`
+   > Dashboard will be live at: `http://localhost:5173`
 
 ---
 
-## 🧪 Testing & Verification
+## Testing & Verification
 
 RazorMind AI includes a comprehensive 12-point automated verification test suite:
 
@@ -313,7 +305,7 @@ python test_suite.py
 
 ---
 
-## 📡 Key API Endpoints
+## Key API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -333,7 +325,7 @@ python test_suite.py
 
 ---
 
-## ⚙️ Environment Configuration
+## Environment Configuration
 
 Create a `.env` file in the root directory (optional, sensible defaults provided):
 
@@ -354,7 +346,7 @@ PORT=8000
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome!  
 Feel free to check out the [issues page](https://github.com/your-username/razormind-ai/issues).
@@ -367,7 +359,7 @@ Feel free to check out the [issues page](https://github.com/your-username/razorm
 
 ---
 
-## 📄 License
+## License
 
 This project is distributed under the **MIT License**. See the `LICENSE` file for details.
 
