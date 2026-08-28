@@ -33,12 +33,14 @@ class LLMService:
         Executes an LLM prompt with automatic timeout, caching, and error handling,
         falling back to intelligent deterministic synthesis if LLM is slow or offline.
         """
-        cache_key = f"{system_context or ''}::{prompt[:200]}"
+        import hashlib
+        full_prompt = f"{system_context}\n\n{prompt}" if system_context else prompt
+        cache_key = hashlib.sha256(full_prompt.encode("utf-8")).hexdigest()
+
         if cache_key in self._cache:
             return self._cache[cache_key]
 
         start_time = time.time()
-        full_prompt = f"{system_context}\n\n{prompt}" if system_context else prompt
 
         llm = self._get_llm()
         if llm:
