@@ -1,5 +1,6 @@
 import time
 import logging
+from datetime import datetime, timezone
 from typing import Dict, Any, List
 from backend.services.llm_service import llm_service
 from backend.routes.traces import save_agent_trace
@@ -12,26 +13,26 @@ def generate_investor_grade_report(
     risk_data: dict,
     recommendations: list
 ) -> str:
-    m_id = revenue_data.get("merchant_id", "M0001")
-    rev = revenue_data.get("total_revenue", 120000.0)
-    succ = revenue_data.get("success_rate", 92.5)
-    ref = revenue_data.get("refund_rate", 1.8)
+    m_id = revenue_data.get("merchant_id", "Unknown")
+    rev = float(revenue_data.get("total_revenue") or 0.0)
+    succ = float(revenue_data.get("success_rate") or 0.0)
+    ref = float(revenue_data.get("refund_rate") or 0.0)
     risk_lvl = risk_data.get("risk_level", "LOW")
-    risk_score = risk_data.get("risk_score", 25.0)
-    conf = risk_data.get("confidence_score", 95.0)
+    risk_score = float(risk_data.get("risk_score") or 0.0)
+    conf = float(risk_data.get("confidence_score") or 70.0)
 
     if forecast_data:
         avg_forecast = sum(f["predicted_revenue"] for f in forecast_data) / len(forecast_data)
         growth_3mo = round(((forecast_data[-1]["predicted_revenue"] - rev) / max(rev, 1.0)) * 100.0, 1)
     else:
-        avg_forecast = rev * 1.03
-        growth_3mo = 3.0
+        avg_forecast = rev
+        growth_3mo = 0.0
 
     rec_bullets = "\n".join([f"- {r}" for r in recommendations[:4]])
 
     return f"""### RazorMind AI Executive Merchant Intelligence Report
 
-**Merchant Target**: `{m_id}` | **Audit Status**: `VERIFIED` | **Evaluation Date**: 2026-08-27
+**Merchant Target**: `{m_id}` | **Audit Status**: `VERIFIED` | **Evaluation Date**: {datetime.now(timezone.utc).date().isoformat()}
 
 ---
 
@@ -41,7 +42,7 @@ Merchant `{m_id}` maintains a **{risk_lvl}** operational risk posture with an ag
 #### 2. Revenue Insights & Throughput Velocity
 - **Gross Monthly Processing Run-Rate**: INR {rev:,.0f}
 - **Net Realized Cashflow (Excluding Refunds)**: INR {rev * (1 - ref/100):,.0f}
-- **Average Ticket Value (AOV)**: INR {revenue_data.get('avg_order_value', 266):,.0f}
+- **Average Ticket Value (AOV)**: INR {float(revenue_data.get('avg_order_value') or 0):,.0f}
 - **Authorization Success Rate**: {succ:.2f}% ({'Optimal processing efficiency' if succ >= 92 else 'Authorization optimization recommended'})
 
 #### 3. Risk Assessment & Fraud Signal Exposure
@@ -52,7 +53,7 @@ Merchant `{m_id}` maintains a **{risk_lvl}** operational risk posture with an ag
 #### 4. Growth Outlook & 90-Day Forecast Trajectory
 - **Projected 3-Month Average Revenue**: `INR {avg_forecast:,.0f}`
 - **Quarterly Trajectory Momentum**: `{'+' if growth_3mo >= 0 else ''}{growth_3mo}%`
-- **Underwriting Stability Band**: 95% confidence variance constrained within ±4.8% of mean projections.
+- **Interval method**: OLS residual 95% band from forecast engine (widens with horizon).
 
 #### 5. Strategic Recommendations & Playbook
 {rec_bullets}
@@ -68,53 +69,33 @@ def executive_report_agent(
     revenue_data: Dict[str, Any],
     forecast_data: List[Dict[str, Any]],
     risk_data: Dict[str, Any],
-    recommendations: List[str]
+    recommendations: List[str],
+    use_llm: bool = True,
 ) -> str:
-    """
-    Generates an investor-grade executive merchant intelligence report.
-    """
     start_time = time.time()
     m_id = revenue_data.get("merchant_id", "Unknown")
 
     try:
-        avg_forecast = int(
-            sum(item["predicted_revenue"] for item in forecast_data) / len(forecast_data)
-        ) if forecast_data else int(revenue_data.get("total_revenue", 100000.0))
-
-        prompt = f"""
-Generate an investor-grade Executive Merchant Intelligence Report.
-
-Merchant Financial & Operational Telemetry:
-- Merchant ID: {m_id}
-- Monthly Revenue: INR {revenue_data.get('total_revenue', 0):,.2f}
-- Success Rate: {revenue_data.get('success_rate', 0):.2f}%
-- Refund Rate: {revenue_data.get('refund_rate', 0):.2f}%
-- Risk Score: {risk_data.get('risk_score', 0)} / 100
-- Risk Level: {risk_data.get('risk_level', 'LOW')}
-- 3-Month Projected Revenue: INR {avg_forecast:,.2f}
-- Prescribed Recommendations: {', '.join(recommendations[:4])}
-
-Structure the output with these exact markdown sections:
-1. Executive Summary
-2. Revenue Insights & Throughput Velocity
-3. Risk Assessment & Fraud Signal Exposure
-4. Growth Outlook & 90-Day Forecast Trajectory
-5. Strategic Recommendations & Playbook
-6. Final Underwriting Decision (Choose: APPROVE, APPROVE WITH MONITORING, MONITOR CLOSELY, or HIGH RISK)
-7. Confidence Score (e.g. 96.5%)
-
-Tone: Top-tier fintech underwriting brief (Stripe / Razorpay Capital / Goldman Sachs). Professional, authoritative, concise (under 400 words).
-"""
         fallback_fn = lambda: generate_investor_grade_report(revenue_data, forecast_data, risk_data, recommendations)
-        report_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
+        if use_llm:
+            avg_forecast = int(
+                sum(item["predicted_revenue"] for item in forecast_data) / len(forecast_data)
+            ) if forecast_data else int(revenue_data.get("total_revenue") or 0)
+            prompt = f"""Generate an investor-grade Executive Merchant Intelligence Report.
+Merchant {m_id}: GMV INR {revenue_data.get('total_revenue', 0):,.2f}, auth {revenue_data.get('success_rate', 0):.2f}%, refund {revenue_data.get('refund_rate', 0):.2f}%, risk {risk_data.get('risk_score', 0)} ({risk_data.get('risk_level')}), 3m avg INR {avg_forecast:,}. Recs: {', '.join(recommendations[:4])}.
+Sections: 1 Executive Summary 2 Revenue 3 Risk 4 Forecast 5 Recommendations 6 Decision 7 Confidence. Ground every number in telemetry. Under 400 words."""
+            report_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
+        else:
+            report_content = fallback_fn()
 
-        exec_time = time.time() - start_time
         save_agent_trace(
             merchant_id=m_id,
             agent_name="Executive Report Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="SUCCESS",
-            output_summary="Generated comprehensive executive report"
+            output_summary="Executive brief generated",
+            confidence=risk_data.get("confidence_score"),
+            reasoning=risk_data.get("explanation") or "",
         )
         return report_content
 

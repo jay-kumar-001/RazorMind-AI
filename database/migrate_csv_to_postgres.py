@@ -76,7 +76,7 @@ def migrate():
             rep_cust = int(row.get("repeat_customers", 50))
             aov = float(row.get("avg_order_value", round(total_rev / max(tot_tx, 1), 2)))
             rev_score = float(row.get("revenue_score", 65.0))
-            ret_score = float(row.get("retention_score", 25.0))
+            ret_score = float(row["retention_score"]) if "retention_score" in row and pd.notna(row.get("retention_score")) else float(row.get("retention_rate", 0.0) or 0.0)
             health_score = float(row.get("merchant_health_score", 75.0))
             status = str(row.get("merchant_status", "Healthy"))
             risk_score = float(row.get("risk_score", round(100.0 - health_score, 2)))
@@ -142,29 +142,7 @@ def migrate():
         db.commit()
         print(f"Successfully created {len(forecast_records)} dynamic forecasts across all merchants!")
 
-        print("Seeding initial analysis intelligence records...")
-        sample_merchants = ["M0001", "M0002", "M0003", "M0004", "M0005", "M0010", "M0025"]
-        for s_id in sample_merchants:
-            m_obj = db.query(Merchant).filter(Merchant.merchant_id == s_id).first()
-            if m_obj:
-                h = m_obj.merchant_health_score or 75.0
-                r_score = m_obj.risk_score or round(100.0 - h, 2)
-                r_lvl = "LOW" if r_score < 30 else ("MEDIUM" if r_score < 60 else "HIGH")
-                dec = "APPROVE" if r_score < 35 else ("APPROVE WITH MONITORING" if r_score < 55 else "MONITOR CLOSELY")
-                analysis = MerchantAnalysis(
-                    merchant_id=s_id,
-                    decision=dec,
-                    risk_level=r_lvl,
-                    risk_score=r_score,
-                    confidence_score=96.0,
-                    executive_report=f"Merchant {s_id} exhibits {r_lvl} operational risk profile with health index {h:.1f}/100. Transaction velocity and authorization parameters remain optimal.",
-                    action_plan="Deploy dynamic gateway retry policies and tokenized checkout acceleration.",
-                    root_causes='{"primary_bottleneck": "Gateway Soft Declines"}',
-                    recommendations='["Enable Smart Retry", "Activate Dynamic Routing"]'
-                )
-                db.add(analysis)
-        db.commit()
-        print("Sample analyses seeded successfully!")
+        print("Seeding skipped canned sample analyses — run /analyze/{id} for live briefs.")
 
     except Exception as e:
         db.rollback()

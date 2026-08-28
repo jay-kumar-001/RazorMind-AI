@@ -26,7 +26,7 @@ export default function ObservabilityTab({ merchant }) {
     setLoading(true);
     setError("");
     try {
-      const [tr, sum] = await Promise.all([getTraces(mid), getTracesSummary()]);
+      const [tr, sum] = await Promise.all([getTraces(mid), getTracesSummary(mid)]);
       setTraces(Array.isArray(tr.data) ? tr.data : []);
       setSummary(sum.data);
     } catch {
@@ -50,8 +50,9 @@ export default function ObservabilityTab({ merchant }) {
 
   const successCount = traces.filter((t) => (t.status || "SUCCESS").toUpperCase() === "SUCCESS").length;
   const avgLatency = traces.length
-    ? (traces.reduce((sum, t) => sum + (t.execution_time_ms || t.duration_ms || 42), 0) / traces.length).toFixed(0)
-    : "38";
+    ? (traces.reduce((sum, t) => sum + (t.execution_time_ms || t.duration_ms || 0), 0) / traces.length).toFixed(0)
+    : "0";
+  const successPct = traces.length ? ((successCount / traces.length) * 100).toFixed(0) : "0";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -62,7 +63,7 @@ export default function ObservabilityTab({ merchant }) {
             <span className="kpi-card-title">Total Agent Executions</span>
             <Cpu size={14} color="var(--text-tertiary)" />
           </div>
-          <div className="kpi-card-num">{traces.length || 25}</div>
+          <div className="kpi-card-num">{traces.length}</div>
           <div className="kpi-card-sub">Recorded spans for {mid}</div>
         </div>
 
@@ -72,9 +73,9 @@ export default function ObservabilityTab({ merchant }) {
             <CheckCircle size={14} color="var(--emerald-text)" />
           </div>
           <div className="kpi-card-num" style={{ color: "var(--emerald-text)" }}>
-            100%
+            {successPct}%
           </div>
-          <div className="kpi-card-sub">{traces.length || 25} successful executions</div>
+          <div className="kpi-card-sub">{successCount} successful / {traces.length} spans</div>
         </div>
 
         <div className="kpi-card">
@@ -157,36 +158,43 @@ export default function ObservabilityTab({ merchant }) {
           <thead>
             <tr>
               <th style={{ width: 40 }}>Status</th>
-              <th>Agent Span Name</th>
-              <th>Execution Output Summary</th>
+              <th>Agent</th>
+              <th>Input / Reasoning</th>
+              <th>Output</th>
+              <th>Confidence</th>
               <th>Duration</th>
               <th>Timestamp</th>
             </tr>
           </thead>
           <tbody>
-            {(traces.length > 0 ? traces : [
-              { agent_name: "Revenue Agent", output_summary: "Loaded merchant financial metrics & AOV", duration_ms: 32, status: "SUCCESS" },
-              { agent_name: "Forecast Agent", output_summary: "Computed 90-day trajectory with 95% CI", duration_ms: 48, status: "SUCCESS" },
-              { agent_name: "Risk Agent", output_summary: "Quantified 4-factor risk model", duration_ms: 24, status: "SUCCESS" },
-              { agent_name: "Root Cause Agent", output_summary: "Diagnosed payment decline bottleneck", duration_ms: 36, status: "SUCCESS" },
-              { agent_name: "Decision Agent", output_summary: "Determined: APPROVE WITH MONITORING", duration_ms: 18, status: "SUCCESS" },
-              { agent_name: "Executive Report Agent", output_summary: "Synthesized executive memorandum", duration_ms: 65, status: "SUCCESS" },
-            ]).map((t, i) => (
-              <tr key={i}>
+            {traces.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ color: "var(--text-tertiary)", textAlign: "center", padding: 20 }}>
+                  No traces yet for {mid}. Run the multi-agent pipeline from Executive Brief.
+                </td>
+              </tr>
+            ) : traces.map((t, i) => (
+              <tr key={t.id || i}>
                 <td>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--emerald)", display: "inline-block" }} />
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: (t.status || "").toUpperCase() === "FAILED" ? "var(--rose)" : "var(--emerald)", display: "inline-block" }} />
                 </td>
                 <td className="mono" style={{ fontWeight: 600 }}>
                   {t.agent_name || t.node_name || "Agent Node"}
                 </td>
+                <td style={{ color: "var(--text-secondary)", fontSize: "11.5px", maxWidth: 220 }}>
+                  {t.reasoning || (typeof t.input === "string" ? t.input : JSON.stringify(t.source_metrics || {}).slice(0, 120))}
+                </td>
                 <td style={{ color: "var(--text-secondary)", fontSize: "12px" }}>
-                  {t.output_summary || "Executed successfully"}
+                  {t.output_summary || "—"}
+                </td>
+                <td className="mono">
+                  {t.confidence != null ? `${Number(t.confidence).toFixed(1)}%` : "—"}
                 </td>
                 <td style={{ fontFamily: "var(--font-mono)", fontSize: "11.5px", color: "var(--text-primary)" }}>
-                  {t.duration_ms || t.execution_time_ms || 35}ms
+                  {t.duration_ms || t.execution_time_ms || 0}ms
                 </td>
                 <td style={{ fontSize: "11px", color: "var(--text-tertiary)" }}>
-                  {t.created_at ? new Date(t.created_at).toLocaleTimeString() : "Just now"}
+                  {t.created_at ? new Date(t.created_at).toLocaleTimeString() : "—"}
                 </td>
               </tr>
             ))}

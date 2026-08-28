@@ -37,13 +37,18 @@ export const runSimulation = (payload) => API.post("/simulate", payload);
 
 // ─── Observability ────────────────────────────────────────────────────────────
 export const getTraces = (id) => API.get(`/agent-traces/${id}`);
-export const getTracesSummary = () => API.get("/traces/summary");
+export const getTracesSummary = (merchantId) =>
+  API.get("/traces/summary", { params: merchantId ? { merchant_id: merchantId } : {} });
 
 // ─── PDF Download ─────────────────────────────────────────────────────────────
 export const getPdfUrl = (id) => `http://127.0.0.1:8000/download-report/${id}`;
 
 // ─── Trigger Analysis ─────────────────────────────────────────────────────────
 export const triggerAnalysis = (id) => API.post(`/analyze/${id}`);
+export const explainRisk = (id) => API.get(`/merchant/${id}/explain-risk`);
+export const compareMerchants = (ids) => API.get("/compare-merchants", { params: { ids } });
+export const whatChanged = (id) => API.get(`/merchant/${id}/what-changed`);
+export const getDueDiligence = (id) => API.get(`/due-diligence/${id}`);
 
 // ─── Upgraded Copilot Endpoints ──────────────────────────────
 export const getConversations = (search = "") => API.get("/copilot/conversations", { params: { search } });

@@ -7,6 +7,9 @@ from agents.revenue_agent import revenue_agent
 from agents.forecast_agent import forecast_agent
 from agents.risk_agent import risk_agent
 from agents.recommendation_agent import recommendation_agent
+from agents.churn_agent import churn_agent
+from agents.rootcause_agent import rootcause_agent
+from agents.decision_agent import decision_agent
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -25,6 +28,9 @@ def download_report(merchant_id: str):
         fc = forecast_agent(merchant_id, months_ahead=3)
         risk = risk_agent(merchant_id)
         recs = recommendation_agent(merchant_id)
+        churn = churn_agent(merchant_id)
+        root = rootcause_agent(merchant_id)
+        decision = decision_agent(risk, fc, merchant_id=merchant_id, churn=churn)
 
         temp_dir = tempfile.gettempdir()
         filename = f"{merchant_id}_intelligence_report.pdf"
@@ -79,7 +85,7 @@ def download_report(merchant_id: str):
         content.append(Paragraph("Core Financial & Processing Telemetry", h2_style))
         table_data = [
             ["Metric", "Value", "Benchmark", "Health Status"],
-            ["Monthly Revenue", f"INR {rev.get('total_revenue', 0):,.0f}", "INR 100,000+", "Optimal"],
+            ["Monthly Revenue", f"INR {rev.get('total_revenue', 0):,.0f}", "—", "Observed"],
             ["Success Rate", f"{rev.get('success_rate', 0):.2f}%", ">= 92.0%", "Optimal" if rev.get('success_rate', 0) >= 92 else "Action Needed"],
             ["Refund Rate", f"{rev.get('refund_rate', 0):.2f}%", "<= 2.0%", "Optimal" if rev.get('refund_rate', 0) <= 2 else "Elevated"],
             ["Composite Risk Score", f"{risk.get('risk_score', 0):.1f} / 100", "< 45.0", risk.get('risk_level', 'LOW')],
@@ -110,7 +116,7 @@ def download_report(merchant_id: str):
                 f"INR {f.get('confidence_lower', 0):,.0f}",
                 f"INR {f.get('predicted_revenue', 0):,.0f}",
                 f"INR {f.get('confidence_upper', 0):,.0f}",
-                f"+{f.get('growth_percent', 2.5):.1f}%"
+                f"+{f.get('growth_percent', 0):.1f}%"
             ])
         t_fc = Table(fc_table, colWidths=[100, 110, 120, 110, 80])
         t_fc.setStyle(TableStyle([
@@ -130,8 +136,36 @@ def download_report(merchant_id: str):
         for r in recs[:5]:
             content.append(Paragraph(f"• {r}", body_style))
 
+        content.append(Paragraph("Churn Analysis", h2_style))
+        content.append(Paragraph(
+            f"P(churn)={churn.get('churn_probability')}% ({churn.get('churn_risk_level')}). "
+            f"{churn.get('explanation','')} Model: {churn.get('model')}.",
+            body_style
+        ))
+
+        content.append(Paragraph("Root Cause", h2_style))
+        content.append(Paragraph(
+            f"Primary: {root.get('primary_bottleneck')}. Est. monthly leakage INR {root.get('estimated_monthly_loss', 0):,.0f}.",
+            body_style
+        ))
+        for iss in (root.get("diagnosed_issues") or [])[:4]:
+            content.append(Paragraph(
+                f"• [{iss.get('severity')}] {iss.get('issue')} — {iss.get('evidence')}",
+                body_style
+            ))
+
+        content.append(Paragraph("Underwriting Decision", h2_style))
+        content.append(Paragraph(
+            f"<b>{decision.get('final_decision')}</b> — {decision.get('decision_rationale')} "
+            f"(confidence {decision.get('confidence_score')}%).",
+            body_style
+        ))
+
         content.append(Spacer(1, 14))
-        content.append(Paragraph(f"<b>Underwriting Confidence</b>: {risk.get('confidence_score', 95.0)}% | Evaluated by RazorMind AI Intelligence Suite", body_style))
+        content.append(Paragraph(
+            f"<b>Data confidence</b>: {risk.get('confidence_score')}% (completeness + sample size, not a marketing 95%).",
+            body_style
+        ))
 
         doc.build(content)
 

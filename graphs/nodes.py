@@ -37,7 +37,7 @@ def save_analysis(state: Dict[str, Any]):
         m_id = state.get("merchant_id", "Unknown")
         decision_val = state.get("decision_data", {}).get("final_decision", "APPROVE")
         risk_lvl = state.get("risk_data", {}).get("risk_level", "LOW")
-        risk_score = state.get("risk_data", {}).get("risk_score", 25.0)
+        risk_score = state.get("risk_data", {}).get("risk_score")
         report_text = state.get("executive_report", "")
         plan_text = state.get("action_plan", {}).get("action_plan", "")
         root_causes = json.dumps(state.get("rootcause_data", {}))
@@ -48,7 +48,7 @@ def save_analysis(state: Dict[str, Any]):
             decision=decision_val,
             risk_level=risk_lvl,
             risk_score=risk_score,
-            confidence_score=state.get("decision_data", {}).get("confidence_score", 95.0),
+            confidence_score=state.get("decision_data", {}).get("confidence_score"),
             executive_report=report_text,
             action_plan=plan_text,
             root_causes=root_causes,
@@ -112,7 +112,8 @@ def decision_node(state: Dict[str, Any]) -> Dict[str, Any]:
     state["decision_data"] = decision_agent(
         risk=state.get("risk_data", {}),
         forecast=state.get("forecast_data", []),
-        merchant_id=state.get("merchant_id", "Unknown")
+        merchant_id=state.get("merchant_id", "Unknown"),
+        churn=state.get("churn_data", {}),
     )
     add_trace(state, "Decision Agent", duration_ms=(time.time() - start) * 1000)
     return state
@@ -122,7 +123,8 @@ def action_plan_node(state: Dict[str, Any]) -> Dict[str, Any]:
     state["action_plan"] = action_plan_agent(
         merchant_id=state["merchant_id"],
         risk_level=state.get("risk_data", {}).get("risk_level", "LOW"),
-        recommendations=state.get("recommendations", [])
+        recommendations=state.get("recommendations", []),
+        use_llm=False,
     )
     add_trace(state, "Action Plan Agent", duration_ms=(time.time() - start) * 1000)
     return state
@@ -133,7 +135,8 @@ def executive_report_node(state: Dict[str, Any]) -> Dict[str, Any]:
         revenue_data=state.get("revenue_data", {}),
         forecast_data=state.get("forecast_data", []),
         risk_data=state.get("risk_data", {}),
-        recommendations=state.get("recommendations", [])
+        recommendations=state.get("recommendations", []),
+        use_llm=False,
     )
     state["final_report"] = {
         "merchant_id": state.get("merchant_id"),

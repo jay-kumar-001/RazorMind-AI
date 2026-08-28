@@ -30,9 +30,10 @@ def get_forecast(
             {
                 "forecast_month": f.forecast_month,
                 "predicted_revenue": f.predicted_revenue,
-                "confidence_lower": f.confidence_lower or round(f.predicted_revenue * 0.94, 2),
-                "confidence_upper": f.confidence_upper or round(f.predicted_revenue * 1.06, 2),
-                "trend_slope": f.trend_slope or 2.1
+                "confidence_lower": f.confidence_lower,
+                "confidence_upper": f.confidence_upper,
+                "trend_slope": f.trend_slope,
+                "method": "stored_revenue_forecasts",
             }
             for f in forecasts
         ]

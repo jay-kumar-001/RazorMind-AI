@@ -24,6 +24,7 @@ from backend.routes.graph_analysis import router as graph_router
 from backend.routes.pdf_report import router as pdf_router
 from backend.routes.auth_routes import router as auth_router
 from backend.routes.kyc import router as kyc_router
+from backend.routes.intelligence import router as intelligence_router
 from backend.routes.transactions import router as transaction_router
 
 app = FastAPI(
@@ -52,11 +53,20 @@ def root():
 
 @app.get("/health")
 def health_check():
+    db_status = "disconnected"
+    try:
+        from backend.database import engine
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        db_status = "connected"
+    except Exception as e:
+        db_status = f"error:{type(e).__name__}"
     return {
-        "status": "healthy",
-        "database": "connected",
-        "agents": 14,
-        "mode": "production-ready"
+        "status": "healthy" if db_status == "connected" else "degraded",
+        "database": db_status,
+        "graph": "merchant_graph",
+        "version": "2.1.0",
     }
 
 # Register clean non-conflicting routers
@@ -82,3 +92,4 @@ app.include_router(pdf_router)
 app.include_router(auth_router)
 app.include_router(kyc_router)
 app.include_router(transaction_router)
+app.include_router(intelligence_router)

@@ -7,44 +7,32 @@ from backend.routes.traces import save_agent_trace
 
 logger = logging.getLogger("razormind.agent.churn")
 
+
 def churn_agent(merchant_id: str) -> Dict[str, Any]:
-    """
-    Analyzes merchant churn propensity and key behavioral drag factors.
-    """
     start_time = time.time()
     try:
         merchant = get_merchant_data(merchant_id)
         if not merchant:
-            class DefaultMerchant:
-                merchant_id = merchant_id
-                success_rate = 92.5
-                refund_rate = 1.8
-                retention_score = 30.0
-                merchant_health_score = 75.0
-                risk_score = 25.0
-                total_revenue = 120000.0
-            merchant = DefaultMerchant()
-
+            raise ValueError(f"Merchant {merchant_id} not found")
         churn_data = churn_service.predict_churn(merchant)
-        exec_time = time.time() - start_time
-
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Churn Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="SUCCESS",
-            output_summary=f"Churn Prob: {churn_data['churn_probability']:.1f}% ({churn_data['churn_risk_level']})"
+            output_summary=f"Churn {churn_data['churn_probability']:.1f}% ({churn_data['churn_risk_level']})",
+            confidence=churn_data.get("confidence_score"),
+            reasoning=churn_data.get("reasoning_summary"),
+            source_metrics=churn_data.get("source_metrics"),
         )
         return churn_data
-
     except Exception as e:
-        logger.error(f"Churn agent error for {merchant_id}: {e}")
-        exec_time = time.time() - start_time
+        logger.error("Churn agent error for %s: %s", merchant_id, e)
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Churn Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="FAILED",
-            output_summary=str(e)
+            output_summary=str(e),
         )
         raise

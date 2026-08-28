@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from backend.database import get_db
 from backend.models import Merchant
+from backend.services.merchant_context import get_merchant_snapshot
 
 router = APIRouter(tags=["Merchants"])
 
@@ -75,6 +76,8 @@ def get_merchant(
     if not merchant:
         raise HTTPException(status_code=404, detail=f"Merchant {merchant_id} not found.")
 
+    snap = get_merchant_snapshot(merchant_id)
+
     return {
         "merchant_id": merchant.merchant_id,
         "merchant_name": merchant.merchant_name or f"Merchant {merchant.merchant_id}",
@@ -89,8 +92,11 @@ def get_merchant(
         "avg_order_value": merchant.avg_order_value or 0.0,
         "revenue_score": merchant.revenue_score or 0.0,
         "retention_score": merchant.retention_score or 0.0,
-        "risk_score": merchant.risk_score or round(100.0 - (merchant.merchant_health_score or 75.0), 2),
+        "risk_score": merchant.risk_score or round(100.0 - (merchant.merchant_health_score or 0.0), 2),
         "merchant_health_score": merchant.merchant_health_score or 0.0,
         "merchant_status": merchant.merchant_status or "Healthy",
+        "chargeback_rate": float(getattr(snap, "chargeback_rate", 0) or 0) if snap else 0.0,
+        "retention_rate": float(getattr(snap, "retention_rate", 0) or (merchant.retention_score or 0)),
+        "data_source": getattr(snap, "data_source", "postgres") if snap else "postgres",
         "created_at": merchant.created_at.isoformat() if merchant.created_at else None
     }

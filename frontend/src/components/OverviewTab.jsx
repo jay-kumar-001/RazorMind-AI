@@ -12,7 +12,7 @@ const cash = (v) =>
 const CustomChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   const count = payload[0].value;
-  const share = ((count / 500) * 100).toFixed(1);
+  const share = payload[0].payload?.share != null ? payload[0].payload.share : "—";
   return (
     <div style={{
       background: "var(--bg-elevated)", border: "1px solid var(--border)",
@@ -60,7 +60,7 @@ export default function OverviewTab({ merchant }) {
       ]
     : [];
 
-  const healthScore = Number(merchant?.merchant_health_score || 0);
+  const riskTotal = riskDist.reduce((s, r) => s + r.value, 0) || 1;
   const riskScore = Number(merchant?.risk_score || 0);
 
   return (
@@ -73,10 +73,10 @@ export default function OverviewTab({ merchant }) {
             <TrendingUp size={14} color="var(--text-tertiary)" />
           </div>
           <div className="kpi-card-num">
-            ₹{dash?.total_gmv_crore || "398.7"} Cr
+            ₹{Number(dash?.total_gmv_crore || 0).toFixed(2)} Cr
           </div>
           <div className="kpi-card-sub">
-            <span className="delta-pos">↑ 12.4%</span> vs prior 30d
+            Portfolio GMV from merchant ledger
           </div>
         </div>
 
@@ -86,7 +86,7 @@ export default function OverviewTab({ merchant }) {
             <Users size={14} color="var(--text-tertiary)" />
           </div>
           <div className="kpi-card-num">
-            {dash?.total_merchants || 500}
+            {dash?.total_merchants ?? 0}
           </div>
           <div className="kpi-card-sub">
             100% active underwriter sync
@@ -113,7 +113,7 @@ export default function OverviewTab({ merchant }) {
             <AlertTriangle size={14} color="var(--amber-text)" />
           </div>
           <div className="kpi-card-num" style={{ color: "var(--amber-text)" }}>
-            {dash?.high_risk_count ?? 94}
+            {dash?.high_risk_count ?? 0}
           </div>
           <div className="kpi-card-sub">
             High & Critical tier merchants
@@ -255,7 +255,7 @@ export default function OverviewTab({ merchant }) {
                     </span>
                   </td>
                   <td style={{ fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                    {a.confidence_score ? `${Number(a.confidence_score).toFixed(0)}%` : "95%"}
+                    {a.confidence_score != null ? `${Number(a.confidence_score).toFixed(0)}%` : "—"}
                   </td>
                   <td style={{ fontSize: 11.5, color: "var(--text-tertiary)" }}>
                     {a.created_at ? new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "Just now"}

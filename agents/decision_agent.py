@@ -5,49 +5,60 @@ from backend.routes.traces import save_agent_trace
 
 logger = logging.getLogger("razormind.agent.decision")
 
+
 def decision_agent(
     risk: Dict[str, Any],
     forecast: List[Dict[str, Any]],
-    merchant_id: str = "Unknown"
+    merchant_id: str = "Unknown",
+    churn: Dict[str, Any] = None,
 ) -> Dict[str, Any]:
-    """
-    Evaluates multi-criteria underwriting decision based on risk profiles and forward projections.
-    """
     start_time = time.time()
     try:
         risk_level = str(risk.get("risk_level", "MEDIUM")).upper()
         risk_score = float(risk.get("risk_score", 50.0))
+        churn_p = float((churn or {}).get("churn_probability") or 0.0)
 
-        if forecast and len(forecast) > 0:
+        if forecast:
             avg_forecast = sum(item["predicted_revenue"] for item in forecast) / len(forecast)
             growth_trend = forecast[-1]["predicted_revenue"] >= forecast[0]["predicted_revenue"]
         else:
-            avg_forecast = 100000.0
+            avg_forecast = 0.0
             growth_trend = True
 
-        # Multi-tiered policy matrix
-        if risk_score <= 25.0 and growth_trend:
+        if risk_score <= 25.0 and growth_trend and churn_p < 40:
             decision = "APPROVE"
-            rationale = "Exceptional operational health with stable authorizations and positive forecast trajectory."
-            audit_score = 98.0
-        elif risk_score <= 45.0:
+            rationale = (
+                f"Risk {risk_score:.1f} (LOW band), forward GMV rising, churn {churn_p:.1f}%. "
+                f"Factors: {', '.join(risk.get('risk_factors', [])[:2])}"
+            )
+        elif risk_score <= 45.0 and churn_p < 55:
             decision = "APPROVE WITH MONITORING"
-            rationale = "Satisfactory fundamentals with mild authorization or volume variance. Approved for standard limits."
-            audit_score = 88.0
+            rationale = (
+                f"Risk {risk_score:.1f} with mild variance. Auth/refund watch. Churn {churn_p:.1f}%."
+            )
         elif risk_score <= 65.0:
             decision = "MONITOR CLOSELY"
-            rationale = "Elevated refund rate or declining authorization success. Requires active monitoring and dynamic routing rules."
-            audit_score = 74.0
+            rationale = (
+                f"Elevated score {risk_score:.1f} ({risk_level}). "
+                f"Primary driver {risk.get('top_driver', 'n/a')}. Churn {churn_p:.1f}%."
+            )
         elif risk_score <= 85.0:
             decision = "HIGH RISK"
-            rationale = "Substantial operational risk identified. Recommend lower transaction velocity limits and dispute safeguards."
-            audit_score = 55.0
+            rationale = (
+                f"Operational risk {risk_score:.1f}. Recommend velocity caps and dispute controls."
+            )
         else:
             decision = "REQUIRES IMMEDIATE INTERVENTION"
-            rationale = "Critical failure thresholds breached. Automatic hold on limit expansion; merchant audit mandated."
-            audit_score = 30.0
+            rationale = (
+                f"Critical score {risk_score:.1f}. Hold limit expansion pending audit."
+            )
 
-        confidence = round(min(99.0, max(85.0, 95.0 - (risk_score * 0.1))), 1)
+        confidence = float(risk.get("confidence_score") or 70.0)
+        if not forecast:
+            confidence -= 8
+        if churn_p >= 65:
+            confidence -= 5
+        confidence = round(min(97.0, max(42.0, confidence)), 1)
 
         result = {
             "final_decision": decision,
@@ -55,28 +66,33 @@ def decision_agent(
             "risk_tier": risk_level,
             "risk_score": risk_score,
             "projected_3mo_avg": round(avg_forecast, 2),
-            "audit_score": audit_score,
-            "confidence_score": confidence
+            "audit_score": round(max(10.0, 100.0 - risk_score), 1),
+            "confidence_score": confidence,
+            "reasoning_summary": rationale,
+            "source_metrics": {
+                "risk_score": risk_score,
+                "churn_probability": churn_p,
+                "forecast_points": len(forecast or []),
+            },
         }
-
-        exec_time = time.time() - start_time
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Decision Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="SUCCESS",
-            output_summary=f"Decision: {decision} (Audit Score: {audit_score})"
+            output_summary=f"{decision} (conf {confidence}%)",
+            confidence=confidence,
+            reasoning=rationale,
+            source_metrics=result["source_metrics"],
         )
         return result
-
     except Exception as e:
-        logger.error(f"Decision agent error: {e}")
-        exec_time = time.time() - start_time
+        logger.error("Decision agent error: %s", e)
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Decision Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="FAILED",
-            output_summary=str(e)
+            output_summary=str(e),
         )
         raise

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getRootCause, getChurn } from "../api/api";
+import { getRootCause, getChurn, explainRisk } from "../api/api";
 import { ShieldCheck, AlertOctagon, TrendingDown, ArrowRight, Zap } from "lucide-react";
 
 const getRiskColor = (score) => {
@@ -19,6 +19,7 @@ export default function RiskTab({ merchant }) {
   const [rootCause, setRootCause] = useState(null);
   const [churn, setChurn] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [explain, setExplain] = useState(null);
   const [error, setError] = useState("");
 
   const mid = merchant?.merchant_id;
@@ -59,6 +60,7 @@ export default function RiskTab({ merchant }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {error && <div className="panel" style={{ color: "var(--rose-text)", fontSize: "12px" }}>{error}</div>}
       {/* ── MULTI-FACTOR SCORECARD ─────────────────────────────────── */}
       <div className="panel">
         <div className="panel-header">
@@ -118,21 +120,46 @@ export default function RiskTab({ merchant }) {
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                   <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-primary)" }}>
-                    {rootCause.primary_bottleneck || "Gateway Soft Declines"}
+                    {rootCause.primary_bottleneck || "No primary bottleneck"}
                   </span>
                   <span className="tag tag-high">PRIMARY CAUSE</span>
                 </div>
                 <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.6 }}>
-                  Suboptimal authorization routing on mobile checkouts resulting in bank server timeouts during 3DS OTP validation.
+                  {(rootCause.diagnosed_issues && rootCause.diagnosed_issues[0]?.underlying_cause)
+                    || rootCause.diagnosed_issues?.[0]?.evidence
+                    || "No diagnostic narrative from the root-cause agent."}
                 </p>
                 <div style={{ display: "flex", gap: 16, marginTop: 10, paddingTop: 8, borderTop: "1px solid var(--border-subtle)", fontSize: "11.5px" }}>
                   <span style={{ color: "var(--text-tertiary)" }}>
-                    Revenue Impact: <strong style={{ color: "var(--rose-text)" }}>~₹1.4L / mo</strong>
+                    Revenue Impact: <strong style={{ color: "var(--rose-text)" }}>
+                      {rootCause.estimated_monthly_loss != null
+                        ? `₹${Number(rootCause.estimated_monthly_loss).toLocaleString("en-IN")}`
+                        : "—"} / mo
+                    </strong>
                   </span>
                   <span style={{ color: "var(--text-tertiary)" }}>
-                    Confidence: <strong style={{ color: "var(--emerald-text)" }}>94.2%</strong>
+                    Confidence: <strong style={{ color: "var(--emerald-text)" }}>
+                      {Number(rootCause.confidence_score || 0).toFixed(1)}%
+                    </strong>
                   </span>
                 </div>
+                <button
+                  className="btn btn-sm"
+                  style={{ marginTop: 10 }}
+                  onClick={() => explainRisk(mid).then((r) => setExplain(r.data)).catch(() => {})}
+                >
+                  Explain my risk
+                </button>
+                {explain && (
+                  <p style={{ fontSize: "11.5px", color: "var(--text-secondary)", marginTop: 8, lineHeight: 1.5 }}>
+                    {explain.explanation}
+                    {explain.feature_importance && (
+                      <span>
+                        {" "}Weights: {Object.entries(explain.feature_importance).map(([k, v]) => `${k}=${v}`).join(", ")}
+                      </span>
+                    )}
+                  </p>
+                )}
               </div>
 
               {(rootCause.diagnosed_issues || []).slice(1, 3).map((iss, i) => (
@@ -183,7 +210,7 @@ export default function RiskTab({ merchant }) {
               Prescribed Underwriting Action
             </div>
             <p style={{ fontSize: "12.5px", color: "var(--text-primary)", lineHeight: 1.6 }}>
-              {churn?.retention_recommendation || "Enable dynamic payment routing, activate instant settlement retry, and launch automated post-purchase communication."}
+              {churn?.recommended_playbook || churn?.retention_recommendation || "No playbook until churn agent returns."}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: "11.5px", color: "var(--accent-text)", fontWeight: 500 }}>
               <Zap size={13} /> Automated trigger available in Action Plan tab

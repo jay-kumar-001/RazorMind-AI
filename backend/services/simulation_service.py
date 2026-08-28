@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 from backend.services.risk_service import risk_service
 from backend.services.forecast_service import forecast_service
+from backend.services.churn_service import churn_service
 
 class MockMerchantSnapshot:
     """Snapshot container for simulation calculation."""
@@ -21,13 +22,14 @@ class SimulationService:
         """
         Executes a high-fidelity Digital Twin what-if simulation on a merchant.
         """
-        base_revenue = float(getattr(merchant, "total_revenue", 100000.0) or 100000.0)
-        base_success = float(getattr(merchant, "success_rate", 92.0) or 92.0)
-        base_refund = float(getattr(merchant, "refund_rate", 2.0) or 2.0)
-        base_retention = float(getattr(merchant, "retention_score", 30.0) or 30.0)
-        base_health = float(getattr(merchant, "merchant_health_score", 75.0) or 75.0)
+        base_revenue = float(getattr(merchant, "total_revenue", 0.0) or 0.0)
+        base_success = float(getattr(merchant, "success_rate", 0.0) or 0.0)
+        base_refund = float(getattr(merchant, "refund_rate", 0.0) or 0.0)
+        base_retention = float(getattr(merchant, "retention_score", 0.0) or 0.0)
+        base_health = float(getattr(merchant, "merchant_health_score", 0.0) or 0.0)
         category = str(getattr(merchant, "category", "E-Commerce") or "E-Commerce")
-        total_tx = int(getattr(merchant, "total_transactions", 500) or 500)
+        total_tx = int(getattr(merchant, "total_transactions", 0) or 0)
+        chargeback = float(getattr(merchant, "chargeback_rate", 0.0) or 0.0)
 
         # Baseline Risk Assessment
         baseline_risk = risk_service.calculate_merchant_risk(merchant)
@@ -83,10 +85,14 @@ class SimulationService:
             retention_score=sim_retention,
             merchant_health_score=sim_health,
             category=category,
-            total_transactions=int(total_tx * volume_mult)
+            total_transactions=int(total_tx * volume_mult),
+            chargeback_rate=chargeback,
+            risk_score=0.0,
         )
 
         sim_risk = risk_service.calculate_merchant_risk(sim_snapshot)
+        sim_snapshot.risk_score = sim_risk["risk_score"]
+        sim_churn = churn_service.predict_churn(sim_snapshot)
         sim_forecast = forecast_service.generate_forecast(sim_snapshot, months_ahead=3)
         baseline_forecast = forecast_service.generate_forecast(merchant, months_ahead=3)
 
@@ -139,9 +145,13 @@ class SimulationService:
                 "risk_level": sim_risk["risk_level"],
                 "success_rate": sim_success,
                 "refund_rate": sim_refund,
-                "forecast": sim_forecast
+                "churn_probability": sim_churn.get("churn_probability"),
+                "forecast": sim_forecast,
+                "recommendations": sim_risk.get("recommendations", []),
+                "explanation": sim_risk.get("explanation"),
             },
-            "impact_summary": impact_summary
+            "impact_summary": impact_summary,
+            "model": "elasticity_twin_v2",
         }
 
 simulation_service = SimulationService()

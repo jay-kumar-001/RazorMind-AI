@@ -1,6 +1,10 @@
 import json
 from backend.database import SessionLocal
 from backend.models import Merchant, MerchantAnalysis, RevenueForecast
+from backend.services.risk_service import risk_service
+from backend.services.forecast_service import forecast_service
+from backend.services.churn_service import churn_service
+from backend.services.merchant_context import get_merchant_snapshot
 
 class RAGService:
     @staticmethod
@@ -22,7 +26,8 @@ class RAGService:
         try:
             # 1. Get Merchant General KPIs
             m = db.query(Merchant).filter(Merchant.merchant_id == merchant_id).first()
-            if not m:
+            snap = get_merchant_snapshot(merchant_id)
+            if not m and not snap:
                 return context
 
             context["merchant_found"] = True
@@ -34,18 +39,33 @@ class RAGService:
             forecasts = db.query(RevenueForecast).filter(RevenueForecast.merchant_id == merchant_id).order_by(RevenueForecast.id.asc()).all()
 
             # Compile text context
+            name = (m.merchant_name if m else None) or getattr(snap, "merchant_name", merchant_id)
+            cat = (m.category if m else None) or getattr(snap, "category", "E-Commerce")
+            ind = (m.industry if m else None) or getattr(snap, "industry", cat)
+            gmv = float((m.total_revenue if m else None) or getattr(snap, "total_revenue", 0) or 0)
+            txs = int((m.total_transactions if m else None) or getattr(snap, "total_transactions", 0) or 0)
+            succ = float((m.success_rate if m else None) or getattr(snap, "success_rate", 0) or 0)
+            ref = float((m.refund_rate if m else None) or getattr(snap, "refund_rate", 0) or 0)
+            ret = float(getattr(snap, "retention_score", None) or (m.retention_score if m else 0) or 0)
+            health = float((m.merchant_health_score if m else None) or getattr(snap, "merchant_health_score", 0) or 0)
+            aov = float((m.avg_order_value if m else None) or getattr(snap, "avg_order_value", 0) or 0)
+            status = (m.merchant_status if m else None) or getattr(snap, "merchant_status", "ACTIVE")
+            act = int((m.active_customers if m else None) or getattr(snap, "active_customers", 0) or 0)
+            rep = int((m.repeat_customers if m else None) or getattr(snap, "repeat_customers", 0) or 0)
+
             lines = [
-                f"### Merchant Profile Context for {merchant_id} ({m.merchant_name or 'Unknown'})",
-                f"- Category: {m.category or 'E-Commerce'} | Industry: {m.industry or 'Retail'}",
-                f"- Total Revenue (GMV): INR {m.total_revenue:,.2f}",
-                f"- Total Transactions: {m.total_transactions:,}",
-                f"- Success Rate: {m.success_rate:.2f}%",
-                f"- Refund Rate: {m.refund_rate:.2f}%",
-                f"- Active Customers: {m.active_customers:,} | Repeat Customers: {m.repeat_customers:,}",
-                f"- Customer Retention Score: {m.retention_score:.2f}%",
-                f"- Average Order Value (AOV): INR {m.avg_order_value:,.2f}",
-                f"- Merchant Health Score: {m.merchant_health_score:.1f}/100",
-                f"- Status: {m.merchant_status or 'Active'}"
+                f"### Merchant Profile Context for {merchant_id} ({name})",
+                f"- Category: {cat} | Industry: {ind}",
+                f"- Total Revenue (GMV): INR {gmv:,.2f}",
+                f"- Total Transactions: {txs:,}",
+                f"- Success Rate: {succ:.2f}%",
+                f"- Refund Rate: {ref:.2f}%",
+                f"- Chargeback Rate: {float(getattr(snap, 'chargeback_rate', 0) or 0):.2f}%",
+                f"- Active Customers: {act:,} | Repeat Customers: {rep:,}",
+                f"- Customer Retention Score: {ret:.2f}%",
+                f"- Average Order Value (AOV): INR {aov:,.2f}",
+                f"- Merchant Health Score: {health:.1f}/100",
+                f"- Status: {status}"
             ]
 
             if analysis:
@@ -103,6 +123,21 @@ class RAGService:
                         f"- Horizon '{f.forecast_month}': Expected Revenue: INR {f.predicted_revenue:,.2f} "
                         f"(Bounds: INR {f.confidence_lower:,.2f} - INR {f.confidence_upper:,.2f}) | Trend: {f.trend_slope or 0.0}%"
                     )
+
+            if snap:
+                live_risk = risk_service.calculate_merchant_risk(snap)
+                live_churn = churn_service.predict_churn(snap)
+                live_fc = forecast_service.generate_forecast(snap, months_ahead=3)
+                context["risk_score"] = live_risk["risk_score"]
+                context["risk_level"] = live_risk["risk_level"]
+                context["agents_consulted"].extend(["Risk Agent", "Churn Agent", "Forecast Agent"])
+                lines.extend([
+                    "\n### Live Agent Ledger (computed now, not a canned brief)",
+                    f"- Risk Agent: {live_risk['risk_score']}/100 {live_risk['risk_level']}. {live_risk.get('explanation','')}",
+                    f"- Churn Agent: {live_churn['churn_probability']}% ({live_churn['churn_risk_level']}). {live_churn.get('explanation','')}",
+                    f"- Forecast Agent Month+1: INR {live_fc[0]['predicted_revenue']:,.0f} [{live_fc[0].get('method')}]",
+                    f"- Recommendations: {'; '.join(live_risk.get('recommendations', [])[:4])}",
+                ])
 
             context["formatted_text"] = "\n".join(lines)
             

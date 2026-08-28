@@ -41,7 +41,7 @@ def get_analysis(analysis_id: int, db: Session = Depends(get_db)):
         "decision": analysis.decision,
         "risk_level": analysis.risk_level,
         "risk_score": getattr(analysis, "risk_score", 0.0),
-        "confidence_score": getattr(analysis, "confidence_score", 95.0),
+        "confidence_score": getattr(analysis, "confidence_score", None),
         "executive_report": analysis.executive_report,
         "action_plan": getattr(analysis, "action_plan", None),
         "created_at": analysis.created_at.isoformat() if analysis.created_at else None

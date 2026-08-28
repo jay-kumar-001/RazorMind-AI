@@ -1,3 +1,4 @@
+import os
 from jose import JWTError, jwt
 
 from fastapi import Depends
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User
 
-SECRET_KEY = "CHANGE_THIS_TO_LONG_RANDOM_SECRET"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -27,8 +28,13 @@ def get_current_user(
         detail="Could not validate credentials"
     )
 
-    try:
+    if not SECRET_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="Authentication is unavailable: SECRET_KEY is not configured"
+        )
 
+    try:
         payload = jwt.decode(
             token,
             SECRET_KEY,

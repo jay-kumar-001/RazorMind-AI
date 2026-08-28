@@ -1,11 +1,18 @@
 from datetime import datetime, timedelta
+import os
 
 from jose import jwt
 from passlib.context import CryptContext
 
-SECRET_KEY = "CHANGE_THIS_TO_LONG_RANDOM_SECRET"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+
+def _get_secret_key() -> str:
+    if not SECRET_KEY:
+        raise RuntimeError("SECRET_KEY must be configured in the environment")
+    return SECRET_KEY
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -42,6 +49,6 @@ def create_access_token(data: dict):
 
     return jwt.encode(
         to_encode,
-        SECRET_KEY,
+        _get_secret_key(),
         algorithm=ALGORITHM
     )

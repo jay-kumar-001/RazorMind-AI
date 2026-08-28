@@ -17,8 +17,8 @@ def get_root_cause_analysis(merchant_id: str):
             "primary_bottleneck": rc.get("primary_bottleneck"),
             "diagnosed_issues": rc.get("diagnosed_issues", []),
             "kpi_benchmarks": kpi.get("kpi_metrics", {}),
-            "operational_grade": kpi.get("operational_grade", "B"),
-            "confidence_score": rc.get("confidence_score", 93.0)
+            "operational_grade": kpi.get("operational_grade"),
+            "confidence_score": rc.get("confidence_score")
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Root cause analysis failed: {str(e)}")

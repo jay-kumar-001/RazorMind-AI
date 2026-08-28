@@ -3,106 +3,128 @@ import logging
 from typing import Dict, Any, List
 from agents.revenue_agent import get_merchant_data
 from backend.routes.traces import save_agent_trace
+from backend.services.merchant_context import data_confidence
 
 logger = logging.getLogger("razormind.agent.rootcause")
 
+
 def rootcause_agent(merchant_id: str) -> Dict[str, Any]:
-    """
-    Performs deep diagnostic attribution to identify primary root causes of merchant risk.
-    """
     start_time = time.time()
     try:
         merchant = get_merchant_data(merchant_id)
         if not merchant:
-            succ, ref, ret, health = 92.5, 1.8, 30.0, 75.0
-        else:
-            succ = float(getattr(merchant, "success_rate", 92.5) or 92.5)
-            ref = float(getattr(merchant, "refund_rate", 1.8) or 1.8)
-            ret = float(getattr(merchant, "retention_score", 30.0) or 30.0)
-            health = float(getattr(merchant, "merchant_health_score", 75.0) or 75.0)
+            raise ValueError(f"Merchant {merchant_id} not found")
+        succ = float(getattr(merchant, "success_rate", 0.0) or 0.0)
+        ref = float(getattr(merchant, "refund_rate", 0.0) or 0.0)
+        cb = float(getattr(merchant, "chargeback_rate", 0.0) or 0.0)
+        ret = float(getattr(merchant, "retention_score", 0.0) or 0.0)
+        health = float(getattr(merchant, "merchant_health_score", 0.0) or 0.0)
+        rev = float(getattr(merchant, "total_revenue", 0.0) or 0.0)
 
         diagnosed_issues: List[Dict[str, Any]] = []
 
         if succ < 90.0:
+            loss = round(rev * ((94.0 - succ) / 100.0) * 0.9, 0)
             diagnosed_issues.append({
                 "issue": "High Payment Gateway Decline Rate",
                 "severity": "HIGH",
-                "evidence": f"Success rate is {succ:.1f}% (Benchmark: >=94%)",
-                "underlying_cause": "Suboptimal gateway routing causing soft bank declines on high-frequency transactions",
-                "estimated_revenue_loss_pct": round((94.0 - succ) * 0.9, 1)
+                "evidence": f"Success rate is {succ:.1f}% (benchmark >=94%)",
+                "underlying_cause": "Soft declines and routing concentration on underperforming acquirers",
+                "estimated_revenue_loss_pct": round((94.0 - succ) * 0.9, 1),
+                "estimated_revenue_loss": loss,
             })
         elif succ < 93.0:
+            loss = round(rev * ((94.0 - succ) / 100.0) * 0.7, 0)
             diagnosed_issues.append({
-                "issue": "Moderate 3DS Challenge Dropoff",
+                "issue": "Moderate 3DS / OTP Dropoff",
                 "severity": "MEDIUM",
                 "evidence": f"Success rate is {succ:.1f}%",
-                "underlying_cause": "Friction during OTP validation and bank server timeouts on mobile checkouts",
-                "estimated_revenue_loss_pct": round((94.0 - succ) * 0.7, 1)
+                "underlying_cause": "Challenge friction on mobile checkout",
+                "estimated_revenue_loss_pct": round((94.0 - succ) * 0.7, 1),
+                "estimated_revenue_loss": loss,
             })
 
         if ref > 3.0:
+            loss = round(rev * (ref / 100.0), 0)
             diagnosed_issues.append({
                 "issue": "Elevated Post-Purchase Refund & Dispute Rate",
                 "severity": "HIGH",
-                "evidence": f"Refund rate is {ref:.1f}% (Threshold: <=2.0%)",
-                "underlying_cause": "Product mismatch, fulfillment delays, or ambiguous cancellation policies",
-                "estimated_revenue_loss_pct": round((ref - 1.5) * 1.2, 1)
+                "evidence": f"Refund rate is {ref:.1f}% (ceiling 2.0%)",
+                "underlying_cause": "Fulfillment, descriptor, or policy mismatch",
+                "estimated_revenue_loss_pct": round((ref - 1.5) * 1.2, 1),
+                "estimated_revenue_loss": loss,
             })
         elif ref > 2.0:
             diagnosed_issues.append({
                 "issue": "Moderate Refund Inflow",
                 "severity": "MEDIUM",
                 "evidence": f"Refund rate is {ref:.1f}%",
-                "underlying_cause": "Occasional order fulfillment mismatches",
-                "estimated_revenue_loss_pct": round((ref - 1.5) * 0.8, 1)
+                "underlying_cause": "Occasional fulfillment mismatches",
+                "estimated_revenue_loss_pct": round((ref - 1.5) * 0.8, 1),
+                "estimated_revenue_loss": round(rev * ((ref - 1.5) / 100.0), 0),
+            })
+
+        if cb > 1.0:
+            diagnosed_issues.append({
+                "issue": "Chargeback Rate Above Watch Threshold",
+                "severity": "HIGH",
+                "evidence": f"Chargeback rate {cb:.2f}% > 1.0%",
+                "underlying_cause": "Weak representment and descriptor clarity",
+                "estimated_revenue_loss_pct": round(cb * 1.1, 1),
+                "estimated_revenue_loss": round(rev * (cb / 100.0), 0),
             })
 
         if ret < 20.0:
             diagnosed_issues.append({
                 "issue": "Customer Churn & Weak Re-order Retention",
                 "severity": "MEDIUM",
-                "evidence": f"Repeat customer score is {ret:.1f}% (Target: >=35%)",
-                "underlying_cause": "Lack of loyalty rewards and absence of automated post-purchase communication",
-                "estimated_revenue_loss_pct": round((35.0 - ret) * 0.4, 1)
+                "evidence": f"Repeat index {ret:.1f}% (target >=35%)",
+                "underlying_cause": "Weak loyalty and post-purchase comms",
+                "estimated_revenue_loss_pct": round((35.0 - ret) * 0.4, 1),
+                "estimated_revenue_loss": round(rev * ((35.0 - ret) / 100.0) * 0.15, 0),
             })
 
         if not diagnosed_issues:
             diagnosed_issues.append({
                 "issue": "Zero Critical Anomalies",
                 "severity": "LOW",
-                "evidence": f"All KPIs operating within prime standards (Health: {health:.1f})",
-                "underlying_cause": "Optimal gateway health and frictionless checkout flow",
-                "estimated_revenue_loss_pct": 0.0
+                "evidence": f"KPIs in prime band (health {health:.1f})",
+                "underlying_cause": "No material bottleneck vs underwriting policy",
+                "estimated_revenue_loss_pct": 0.0,
+                "estimated_revenue_loss": 0.0,
             })
 
-        primary_bottleneck = diagnosed_issues[0]["issue"] if diagnosed_issues else "None"
-
+        primary = diagnosed_issues[0]
+        conf = data_confidence(merchant)
+        if primary["severity"] == "LOW":
+            conf = min(conf, 88.0)
+        reasoning = f"Primary bottleneck: {primary['issue']} — {primary['evidence']}"
         result = {
             "merchant_id": merchant_id,
-            "primary_bottleneck": primary_bottleneck,
+            "primary_bottleneck": primary["issue"],
             "diagnosed_issues": diagnosed_issues,
             "total_issues_detected": len([d for d in diagnosed_issues if d["severity"] != "LOW"]),
-            "confidence_score": 93.0
+            "confidence_score": conf,
+            "reasoning_summary": reasoning,
+            "estimated_monthly_loss": primary.get("estimated_revenue_loss", 0),
         }
-
-        exec_time = time.time() - start_time
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Root Cause Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="SUCCESS",
-            output_summary=f"Identified bottleneck: {primary_bottleneck}"
+            output_summary=reasoning,
+            confidence=conf,
+            reasoning=reasoning,
         )
         return result
-
     except Exception as e:
-        logger.error(f"RootCause agent error for {merchant_id}: {e}")
-        exec_time = time.time() - start_time
+        logger.error("RootCause agent error for %s: %s", merchant_id, e)
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Root Cause Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="FAILED",
-            output_summary=str(e)
+            output_summary=str(e),
         )
         raise

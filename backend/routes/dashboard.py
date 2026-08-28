@@ -11,11 +11,11 @@ def dashboard_summary(db: Session = Depends(get_db)):
     """
     Returns executive portfolio intelligence across all active merchants.
     """
-    total_merchants = db.query(Merchant).count() or 500
+    total_merchants = db.query(Merchant).count() or 0
     total_gmv = db.query(func.sum(Merchant.total_revenue)).scalar() or 0.0
-    avg_success = db.query(func.avg(Merchant.success_rate)).scalar() or 92.4
-    avg_refund = db.query(func.avg(Merchant.refund_rate)).scalar() or 1.85
-    avg_health = db.query(func.avg(Merchant.merchant_health_score)).scalar() or 74.5
+    avg_success = db.query(func.avg(Merchant.success_rate)).scalar() or 0.0
+    avg_refund = db.query(func.avg(Merchant.refund_rate)).scalar() or 0.0
+    avg_health = db.query(func.avg(Merchant.merchant_health_score)).scalar() or 0.0
 
     # Risk tier segmentation based on risk_score
     low_risk = db.query(Merchant).filter(Merchant.risk_score < 30.0).count()

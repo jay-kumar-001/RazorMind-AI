@@ -24,20 +24,10 @@ def digital_twin_agent(
     try:
         merchant = get_merchant_data(merchant_id)
         if not merchant:
-            class DefaultMerchant:
-                merchant_id = merchant_id
-                total_revenue = 120000.0
-                success_rate = 92.5
-                refund_rate = 1.8
-                retention_score = 30.0
-                merchant_health_score = 75.0
-                category = "E-Commerce"
-                total_transactions = 450
-            merchant = DefaultMerchant()
+            raise ValueError(f"Merchant {merchant_id} not found")
 
-        # Handle absolute simulated rates if passed
-        base_succ = float(getattr(merchant, "success_rate", 92.5) or 92.5)
-        base_ref = float(getattr(merchant, "refund_rate", 1.8) or 1.8)
+        base_succ = float(getattr(merchant, "success_rate", 0.0) or 0.0)
+        base_ref = float(getattr(merchant, "refund_rate", 0.0) or 0.0)
 
         if simulated_success_rate is not None:
             success_delta = simulated_success_rate - base_succ

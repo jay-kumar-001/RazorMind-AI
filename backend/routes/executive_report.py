@@ -28,9 +28,9 @@ def get_executive_report(merchant_id: str):
         return {
             "merchant_id": merchant_id,
             "report": report_text,
-            "risk_score": risk.get("risk_score", 25.0),
-            "risk_level": risk.get("risk_level", "LOW"),
-            "confidence_score": risk.get("confidence_score", 95.0)
+            "risk_score": risk.get("risk_score"),
+            "risk_level": risk.get("risk_level"),
+            "confidence_score": risk.get("confidence_score")
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Executive report failed: {str(e)}")

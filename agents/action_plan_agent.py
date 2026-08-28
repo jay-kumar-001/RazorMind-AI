@@ -8,134 +8,119 @@ from backend.routes.traces import save_agent_trace
 
 logger = logging.getLogger("razormind.agent.action_plan")
 
+
+def _auth_gap_lift(merchant_data: dict) -> float:
+    succ = float(merchant_data.get("success_rate") or 0.0)
+    rev = float(merchant_data.get("total_revenue") or 0.0)
+    gap = max(0.0, 94.0 - succ)
+    return round(rev * (gap / 100.0) * 0.6, 2)
+
+
 def generate_dynamic_action_plan(merchant_data: dict, risk_data: dict, recommendations: List[str]) -> str:
     m_id = merchant_data.get("merchant_id", "Merchant")
-    health = merchant_data.get("merchant_health_score", 75.0)
-    succ = merchant_data.get("success_rate", 92.0)
-    ref = merchant_data.get("refund_rate", 1.8)
+    health = float(merchant_data.get("merchant_health_score") or 0.0)
+    succ = float(merchant_data.get("success_rate") or 0.0)
+    ref = float(merchant_data.get("refund_rate") or 0.0)
     risk_lvl = risk_data.get("risk_level", "LOW")
-
-    primary_rec = recommendations[0] if recommendations else "Optimize Gateway Failover Rules"
-    secondary_rec = recommendations[1] if len(recommendations) > 1 else "Audit Chargeback Exposure"
+    primary_rec = recommendations[0] if recommendations else "Optimize gateway failover for this merchant's decline mix"
+    secondary_rec = recommendations[1] if len(recommendations) > 1 else "Audit refund SKUs against AOV"
+    auth_gap = max(0.0, 94.0 - succ)
+    lift = _auth_gap_lift(merchant_data)
+    risk_cut = round(min(12.0, auth_gap * 0.8 + max(0, ref - 2.0) * 1.2), 1)
 
     return f"""### 30-Day Tactical Merchant Action Plan: {m_id}
 
 **Risk Posture**: `{risk_lvl}` | **Health Baseline**: `{health:.1f}/100` | **Success Rate**: `{succ:.1f}%`
 
 #### Week 1: Diagnostic & Immediate Routing Optimization
-- Audit top failure response codes (`Do Not Honor`, `Insufficient Funds`, `3DS Timeout`).
+- Audit top failure response codes for this MID.
 - **Action**: {primary_rec}.
-- Implement adaptive card routing across primary and backup banking acquirers.
-- **Milestone**: Recover +1.5% in soft bank declines within 7 days.
+- **Milestone**: Close ~{min(auth_gap, 1.5):.1f}pp of the {auth_gap:.1f}pp auth gap.
 
 #### Week 2: Refund & Friction Elimination
-- Review return/refund dispute velocity (Current: {ref:.1f}%).
+- Current refund velocity: {ref:.1f}%.
 - **Action**: {secondary_rec}.
-- Integrate real-time pre-chargeback dispute alert webhooks (Ethoca/Verifi) to intercept inquiries.
-- **Milestone**: Reduce refund processing turnaround time to < 24 hours.
+- **Milestone**: Target refund ≤ {max(1.5, ref - 0.4):.1f}%.
 
 #### Week 3: Customer Retention & Checkout Acceleration
-- Implement tokenized 1-click checkout for repeat customers (Retention index: {merchant_data.get('retention_score', 25):.1f}%).
-- Deploy automated SMS/WhatsApp order status notifications to prevent buyer remorse.
-- **Milestone**: Increase repeat buyer checkout completion by +2.2%.
+- Retention index: {float(merchant_data.get('retention_score') or 0):.1f}%.
+- Tokenized checkout + post-purchase notifications.
 
-#### Week 4: Risk Calibration & Performance Review
-- Re-evaluate composite risk scorecard and underwriter monitoring parameters.
-- Benchmark authorization metrics against 30-day historical baseline.
-- Conduct executive sign-off for line-of-credit expansion.
-- **Milestone**: Finalize risk tier re-certification and confirm expected monthly revenue lift.
+#### Week 4: Risk Recalibration
+- Re-run the same weighted scorecard vs day-0 baseline.
+- Confirm whether the merchant can move underwriting tier.
 
 ---
-**Expected 30-Day Business Outcome**:
-- **Projected Revenue Lift**: `+INR {round(merchant_data.get('total_revenue', 100000) * 0.045, 0):,}` per month.
-- **Target Authorization Rate**: `+{min(99.0, succ + 2.5):.1f}%`.
-- **Target Risk Reduction**: `-8.5 points` on composite risk index.
+**Expected 30-Day Business Outcome** (auth-gap capture, not a flat multiplier):
+- **Projected Revenue Lift**: `+INR {lift:,}` / month
+- **Target Authorization Rate**: `{min(99.0, succ + min(2.5, auth_gap)):.1f}%`
+- **Target Risk Reduction**: `~{risk_cut} points` if Weeks 1–2 land
 """
+
 
 def action_plan_agent(
     merchant_id: str,
     risk_level: str = "MEDIUM",
-    recommendations: List[str] = None
+    recommendations: List[str] = None,
+    use_llm: bool = True,
 ) -> Dict[str, Any]:
-    """
-    Generates a personalized, tactical 30-day action plan tailored to merchant metrics and risk tier.
-    """
     start_time = time.time()
     try:
         merchant = get_merchant_data(merchant_id)
         if not merchant:
-            class DefaultMerchant:
-                merchant_id = merchant_id
-                merchant_name = merchant_id
-                total_revenue = 120000.0
-                success_rate = 92.5
-                refund_rate = 1.8
-                retention_score = 30.0
-                merchant_health_score = 75.0
-            merchant = DefaultMerchant()
+            raise ValueError(f"Merchant {merchant_id} not found")
 
         risk_data = risk_service.calculate_merchant_risk(merchant)
         recs = recommendations or risk_data.get("recommendations", [])
-
         merchant_dict = {
             "merchant_id": merchant_id,
-            "total_revenue": float(getattr(merchant, "total_revenue", 120000.0) or 120000.0),
-            "success_rate": float(getattr(merchant, "success_rate", 92.5) or 92.5),
-            "refund_rate": float(getattr(merchant, "refund_rate", 1.8) or 1.8),
-            "retention_score": float(getattr(merchant, "retention_score", 30.0) or 30.0),
-            "merchant_health_score": float(getattr(merchant, "merchant_health_score", 75.0) or 75.0)
+            "total_revenue": float(getattr(merchant, "total_revenue", 0.0) or 0.0),
+            "success_rate": float(getattr(merchant, "success_rate", 0.0) or 0.0),
+            "refund_rate": float(getattr(merchant, "refund_rate", 0.0) or 0.0),
+            "retention_score": float(getattr(merchant, "retention_score", 0.0) or 0.0),
+            "merchant_health_score": float(getattr(merchant, "merchant_health_score", 0.0) or 0.0),
         }
-
-        prompt = f"""
-You are an elite Fintech Merchant Growth Consultant & Risk Underwriter.
-
-Generate a comprehensive 30-Day Merchant Action Plan for Merchant {merchant_id}.
-
-Context:
-- Revenue: INR {merchant_dict['total_revenue']:,.2f}
-- Success Rate: {merchant_dict['success_rate']:.2f}%
-- Refund Rate: {merchant_dict['refund_rate']:.2f}%
-- Health Score: {merchant_dict['merchant_health_score']:.1f}/100
-- Risk Level: {risk_data['risk_level']} (Score: {risk_data['risk_score']})
-- Priority Recommendations: {', '.join(recs[:3])}
-
-Structure the plan strictly as:
-- Executive Overview
-- Week 1: Diagnostic & Immediate Routing Optimization
-- Week 2: Refund & Friction Elimination
-- Week 3: Customer Retention & Checkout Acceleration
-- Week 4: Risk Calibration & Performance Review
-- Expected 30-Day Business Outcome (Revenue lift and risk shift)
-
-Be highly quantitative and specific to these metrics. Under 350 words.
-"""
+        lift = _auth_gap_lift(merchant_dict)
         fallback_fn = lambda: generate_dynamic_action_plan(merchant_dict, risk_data, recs)
-        plan_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
+        if use_llm:
+            prompt = f"""Write a 30-day action plan for merchant {merchant_id}.
+Revenue INR {merchant_dict['total_revenue']:,.0f}, auth {merchant_dict['success_rate']:.2f}%, refund {merchant_dict['refund_rate']:.2f}%, health {merchant_dict['merchant_health_score']:.1f}, risk {risk_data['risk_level']} ({risk_data['risk_score']}).
+Recs: {', '.join(recs[:3])}.
+Use weeks 1-4. Quantify lift from the {max(0, 94 - merchant_dict['success_rate']):.1f}pp auth gap (est. INR {lift:,.0f}/mo). Under 350 words."""
+            plan_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
+        else:
+            plan_content = fallback_fn()
 
-        exec_time = time.time() - start_time
+        weeks = [
+            {"week": "Week 1", "title": "Routing & decline triage", "items": [recs[0]] if recs else ["Audit decline codes"]},
+            {"week": "Week 2", "title": "Refund & dispute control", "items": [recs[1]] if len(recs) > 1 else ["Refund SKU audit"]},
+            {"week": "Week 3", "title": "Retention & checkout", "items": ["Tokenized checkout", "Post-purchase comms"]},
+            {"week": "Week 4", "title": "Rescore & underwriting signoff", "items": ["Re-run risk scorecard", "Tier review"]},
+        ]
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Action Plan Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="SUCCESS",
-            output_summary="Generated 30-Day tactical roadmap"
+            output_summary=f"Lift estimate INR {lift:,.0f}/mo",
+            confidence=risk_data.get("confidence_score"),
+            reasoning=f"Lift from auth gap vs 94% benchmark, not a fixed 4.5% of GMV.",
         )
-
         return {
             "merchant_id": merchant_id,
             "action_plan": plan_content,
             "risk_level": risk_data["risk_level"],
-            "expected_revenue_impact": round(merchant_dict["total_revenue"] * 0.045, 2)
+            "expected_revenue_impact": lift,
+            "milestones": weeks,
+            "target_risk_tier": "LOW" if risk_data["risk_score"] < 40 else ("MEDIUM" if risk_data["risk_score"] < 65 else "HIGH"),
         }
-
     except Exception as e:
-        logger.error(f"Action plan agent error for {merchant_id}: {e}")
-        exec_time = time.time() - start_time
+        logger.error("Action plan agent error for %s: %s", merchant_id, e)
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Action Plan Agent",
-            execution_time=exec_time,
+            execution_time=time.time() - start_time,
             status="FAILED",
-            output_summary=str(e)
+            output_summary=str(e),
         )
         raise

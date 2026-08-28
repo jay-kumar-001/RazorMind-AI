@@ -195,7 +195,8 @@ async def stream_chat_tokens(req: ChatStreamRequest):
             rag_context_text = rag_data["formatted_text"]
             agents_consulted = rag_data["agents_consulted"]
             system_prompt_parts.append(
-                f"\nGround your response strictly in this live retrieved merchant intelligence ledger:\n{rag_context_text}"
+                f"\nGround your response strictly in this live retrieved merchant intelligence ledger. "
+                f"Do not give generic ChatGPT answers. Cite the merchant's numbers.\n{rag_context_text}"
             )
         else:
             system_prompt_parts.append(f"\n[Warning] Merchant ID {merchant_id} was not found in postgres tables.")

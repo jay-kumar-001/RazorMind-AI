@@ -113,7 +113,7 @@ Merchant **${merchant.merchant_name || mid}** (${mid}) operates in the **${merch
 - **Settlement Terms**: T+1 Standard Settlement with automated dispute reserves.
 - **Audit Confidence**: ${Number(decision?.confidence_score || report?.confidence_score || 95).toFixed(0)}%`;
 
-  const reportText = report?.report || defaultContent;
+  const reportText = report?.report || "No executive report is available yet. Re-run the multi-agent pipeline to generate a data-grounded briefing.";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -179,7 +179,7 @@ Merchant **${merchant.merchant_name || mid}** (${mid}) operates in the **${merch
             <div>
               <div className="eyebrow">Audit Confidence</div>
               <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--emerald-text)", fontFamily: "var(--font-mono)" }}>
-                {Number(decision?.confidence_score || report?.confidence_score || 95).toFixed(0)}%
+                {decision?.confidence_score ?? report?.confidence_score ?? "—"}{(decision?.confidence_score ?? report?.confidence_score) != null ? "%" : ""}
               </div>
             </div>
             <div>
@@ -193,7 +193,7 @@ Merchant **${merchant.merchant_name || mid}** (${mid}) operates in the **${merch
 
         {/* Determination Banner */}
         <DecisionCallout
-          decision={decision?.final_decision || "APPROVE WITH MONITORING"}
+          decision={decision?.final_decision}
           rationale={decision?.decision_rationale}
         />
 
