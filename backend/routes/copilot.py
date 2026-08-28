@@ -107,10 +107,27 @@ def stop_chat_generation(req: ChatStreamRequest):
 @router.get("/copilot/models")
 async def get_ollama_models():
     models = await ollama_streaming_service.list_local_models()
+    
+    # Determine default without querying Ollama again
+    from backend.settings import PREFERRED_MODELS
+    active_default = "qwen2.5:3b"
+    
+    if models:
+        for pref in PREFERRED_MODELS:
+            for inst in models:
+                if inst == pref or inst.startswith(pref + ":"):
+                    active_default = inst
+                    break
+            else:
+                continue
+            break
+        if not active_default and models:
+            active_default = models[0]
+
     return {
         "status": "online" if models else "offline",
         "models": models,
-        "active_default": await ollama_streaming_service.get_active_model()
+        "active_default": active_default
     }
 
 # --- File Upload Endpoint ---

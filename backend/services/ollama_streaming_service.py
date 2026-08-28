@@ -14,20 +14,33 @@ CANCELLED_TASKS: Dict[str, bool] = {}
 class OllamaStreamingService:
     def __init__(self):
         self.base_url = "http://localhost:11434"
+        self._cached_models = []
+        self._last_cache_time = 0.0
 
     async def list_local_models(self) -> List[str]:
         """
-        Queries local Ollama instance for installed models.
+        Queries local Ollama instance for installed models with memory caching.
         """
+        # Cache for 15 seconds
+        if time.time() - self._last_cache_time < 15.0:
+            return self._cached_models
+
         try:
-            async with httpx.AsyncClient(timeout=3.0) as client:
+            async with httpx.AsyncClient(timeout=1.0) as client:
                 res = await client.get(f"{self.base_url}/api/tags")
                 if res.status_code == 200:
                     data = res.json()
                     models = [m["name"] for m in data.get("models", [])]
+                    self._cached_models = models
+                    self._last_cache_time = time.time()
                     return models
         except Exception as e:
             logger.warning(f"Ollama offline or tags endpoint unreachable: {e}")
+            if self._cached_models:
+                return self._cached_models
+        
+        self._cached_models = []
+        self._last_cache_time = time.time()
         return []
 
     async def get_active_model(self, selected_model: str = None) -> str:
