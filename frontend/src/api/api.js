@@ -45,4 +45,23 @@ export const getPdfUrl = (id) => `http://127.0.0.1:8000/download-report/${id}`;
 // ─── Trigger Analysis ─────────────────────────────────────────────────────────
 export const triggerAnalysis = (id) => API.post(`/analyze/${id}`);
 
+// ─── Upgraded Copilot Endpoints ──────────────────────────────
+export const getConversations = (search = "") => API.get("/copilot/conversations", { params: { search } });
+export const createConversation = (payload) => API.post("/copilot/conversations", payload);
+export const renameConversation = (id, title) => API.put(`/copilot/conversations/${id}`, { title });
+export const deleteConversation = (id) => API.delete(`/copilot/conversations/${id}`);
+export const clearConversations = () => API.delete("/copilot/conversations");
+export const getConversationMessages = (id) => API.get(`/copilot/conversations/${id}/messages`);
+export const stopChatGeneration = (conversation_id, question, model_name = null) => 
+  API.post("/copilot/chat/stop", { conversation_id, question, model_name });
+export const getOllamaModels = () => API.get("/copilot/models");
+export const uploadFileAnalysis = (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return API.post("/copilot/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+};
+export const getExportUrl = (id, format) => `http://127.0.0.1:8000/copilot/conversations/${id}/export?format=${format}`;
+
 export default API;
