@@ -34,6 +34,7 @@ const PROMPT_SUGGESTIONS_MERCHANT = [
 ];
 
 export default function CopilotTab({ merchant }) {
+  const riskScore = merchant?.risk_score || 0.0;
   // Sidebar states
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
@@ -92,9 +93,9 @@ export default function CopilotTab({ merchant }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent, loading]);
 
-  const loadModels = async () => {
+  const loadModels = async (sync = false) => {
     try {
-      const res = await getOllamaModels();
+      const res = await getOllamaModels(sync);
       setOllamaStatus(res.data.status);
       setModels(res.data.models || []);
       if (res.data.active_default) {
@@ -575,6 +576,18 @@ export default function CopilotTab({ merchant }) {
                 <option value="qwen2.5:3b">qwen2.5:3b (Offline)</option>
               )}
             </select>
+
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                alert("Auto-detecting installed local Ollama models...");
+                loadModels(true);
+              }}
+              style={{ fontSize: "10px", padding: "4px 8px", minWidth: "50px" }}
+              title="Click to fetch live models from Ollama daemon"
+            >
+              Sync
+            </button>
 
             {/* Export options */}
             {activeConvId && messages.length > 0 && (

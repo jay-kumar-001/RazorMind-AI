@@ -54,7 +54,7 @@ export const clearConversations = () => API.delete("/copilot/conversations");
 export const getConversationMessages = (id) => API.get(`/copilot/conversations/${id}/messages`);
 export const stopChatGeneration = (conversation_id, question, model_name = null) => 
   API.post("/copilot/chat/stop", { conversation_id, question, model_name });
-export const getOllamaModels = () => API.get("/copilot/models");
+export const getOllamaModels = (sync = false) => API.get("/copilot/models", { params: { sync } });
 export const uploadFileAnalysis = (file) => {
   const formData = new FormData();
   formData.append("file", file);

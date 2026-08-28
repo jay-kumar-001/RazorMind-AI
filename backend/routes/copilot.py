@@ -105,9 +105,15 @@ def stop_chat_generation(req: ChatStreamRequest):
 
 # --- Model Detection Endpoint ---
 @router.get("/copilot/models")
-async def get_ollama_models():
-    models = await ollama_streaming_service.list_local_models()
-    
+async def get_ollama_models(sync: bool = Query(False, description="Sync models dynamically with Ollama daemon")):
+    if sync:
+        models = await ollama_streaming_service.list_local_models()
+    else:
+        models = ollama_streaming_service._cached_models
+        if not models:
+            # High-performance instant default list
+            models = ["qwen2.5:3b", "llama3.1", "qwen2.5:latest", "llama3.2"]
+            
     # Determine default without querying Ollama again
     from backend.settings import PREFERRED_MODELS
     active_default = "qwen2.5:3b"
@@ -125,7 +131,7 @@ async def get_ollama_models():
             active_default = models[0]
 
     return {
-        "status": "online" if models else "offline",
+        "status": "online" if (sync or ollama_streaming_service._cached_models) else "cached",
         "models": models,
         "active_default": active_default
     }
