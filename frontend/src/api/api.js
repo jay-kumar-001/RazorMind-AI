@@ -54,10 +54,20 @@ export const getDueDiligence = (id) => API.get(`/due-diligence/${id}`);
 export const getConversations = (search = "") => API.get("/copilot/conversations", { params: { search } });
 export const createConversation = (payload) => API.post("/copilot/conversations", payload);
 export const renameConversation = (id, title) => API.put(`/copilot/conversations/${id}`, { title });
+export const updateConversationSettings = (id, payload) => API.patch(`/copilot/conversations/${id}`, payload);
 export const deleteConversation = (id) => API.delete(`/copilot/conversations/${id}`);
 export const clearConversations = () => API.delete("/copilot/conversations");
-export const getConversationMessages = (id) => API.get(`/copilot/conversations/${id}/messages`);
-export const stopChatGeneration = (conversation_id, question, model_name = null) => 
+export const getConversationMessages = (id, limit = null, before = null) => 
+  API.get(`/copilot/conversations/${id}/messages`, { params: { limit, before } });
+export const deleteMessage = (message_id, conversation_id) =>
+  API.delete(`/copilot/messages/${message_id}`, { params: { conversation_id } });
+export const editMessage = (message_id, conversation_id, content) =>
+  API.patch(`/copilot/messages/${message_id}`, { conversation_id, content });
+export const getMessageVersions = (message_id, conversation_id) =>
+  API.get(`/copilot/messages/${message_id}/versions`, { params: { conversation_id } });
+export const setMessageVersion = (conversation_id, message_id) =>
+  API.post("/copilot/messages/version", { conversation_id, message_id });
+export const stopChatGeneration = (conversation_id, question = "", model_name = null) => 
   API.post("/copilot/chat/stop", { conversation_id, question, model_name });
 export const getOllamaModels = (sync = false) => API.get("/copilot/models", { params: { sync } });
 export const uploadFileAnalysis = (file) => {

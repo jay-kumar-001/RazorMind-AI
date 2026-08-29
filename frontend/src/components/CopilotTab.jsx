@@ -1,69 +1,143 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import { 
-  getConversations, createConversation, renameConversation, 
-  deleteConversation, clearConversations, getConversationMessages, 
-  stopChatGeneration, getOllamaModels, uploadFileAnalysis, getExportUrl 
+import {
+  getConversations,
+  createConversation,
+  renameConversation,
+  deleteConversation,
+  clearConversations,
+  getConversationMessages,
+  deleteMessage,
+  editMessage,
+  getMessageVersions,
+  setMessageVersion,
+  stopChatGeneration,
+  getOllamaModels,
+  uploadFileAnalysis,
+  getExportUrl,
 } from "../api/api";
-import { 
-  Send, Bot, User, Sparkles, Trash2, Plus, Search, 
-  StopCircle, RotateCcw, Copy, Paperclip, Mic, Download, 
-  BookOpen, Briefcase, Shield, TrendingUp, Compass, Edit2
+import {
+  Send,
+  Bot,
+  User,
+  Sparkles,
+  Trash2,
+  Plus,
+  Search,
+  StopCircle,
+  RotateCcw,
+  Copy,
+  Check,
+  Paperclip,
+  Mic,
+  Download,
+  BookOpen,
+  Briefcase,
+  Shield,
+  TrendingUp,
+  Compass,
+  Edit2,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
+  Cpu,
+  Layers,
+  HelpCircle,
+  Code2,
+  CornerDownLeft,
 } from "lucide-react";
 
 const PERSONALITIES = [
-  { id: "general", label: "General Assistant", icon: <Compass size={12} /> },
-  { id: "analyst", label: "Business Analyst", icon: <BookOpen size={12} /> },
-  { id: "risk", label: "Risk Expert", icon: <Shield size={12} /> },
-  { id: "underwriter", label: "Risk Underwriter", icon: <Briefcase size={12} /> },
-  { id: "growth", label: "Growth Consultant", icon: <TrendingUp size={12} /> }
+  { id: "general", label: "General Assistant", icon: Compass },
+  { id: "analyst", label: "Business Analyst", icon: BookOpen },
+  { id: "risk", label: "Risk Expert", icon: Shield },
+  { id: "underwriter", label: "Risk Underwriter", icon: Briefcase },
+  { id: "growth", label: "Growth Consultant", icon: TrendingUp },
 ];
 
-const PROMPT_SUGGESTIONS_GENERAL = [
-  "Explain LangGraph orchestration",
-  "Write a Python script to sort a list",
-  "What is the difference between RNN and Transformer?",
-  "How to prepare for a software engineer interview"
-];
-
-const PROMPT_SUGGESTIONS_MERCHANT = [
-  "Why is this merchant risky?",
-  "What is the churn probability for next month?",
-  "Suggest ways to improve payment success rate",
-  "Summarize the underwriting decision and rationale"
+const STARTER_CATEGORIES = [
+  {
+    category: "Merchant Intelligence",
+    icon: Shield,
+    color: "var(--accent)",
+    prompts: [
+      "What is happening with this merchant?",
+      "Why is churn risk elevated?",
+      "Explain the revenue forecast and confidence bounds",
+      "Summarize the underwriting decision and 30-day playbook",
+    ],
+  },
+  {
+    category: "RazorMind Architecture",
+    icon: Layers,
+    color: "var(--emerald-text)",
+    prompts: [
+      "What does the RazorMind platform do?",
+      "Explain the LangGraph 10-agent orchestration workflow",
+      "How is the composite risk score calculated?",
+      "What does the Digital Twin simulation engine do?",
+    ],
+  },
+  {
+    category: "General Tech & AI",
+    icon: Cpu,
+    color: "var(--amber-text)",
+    prompts: [
+      "Explain Transformer self-attention architecture",
+      "How does UPI payment authorization flow work?",
+      "Write a Python function for weighted moving average",
+      "Explain the difference between FastAPI and Flask",
+    ],
+  },
 ];
 
 export default function CopilotTab({ merchant }) {
   const riskScore = merchant?.risk_score || 0.0;
-  // Sidebar states
+
+  // Sidebar & Layout states
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [editingConvId, setEditingConvId] = useState(null);
+  const [editingConvTitle, setEditingConvTitle] = useState("");
+
   // Active Conversation states
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
-  
+  const [editingMsgId, setEditingMsgId] = useState(null);
+  const [editMsgContent, setEditMsgContent] = useState("");
+
   // Settings states
-  const [mode, setMode] = useState("general"); // 'merchant' | 'general'
+  const [mode, setMode] = useState("merchant"); // 'merchant' | 'general'
   const [personality, setPersonality] = useState("general");
   const [models, setModels] = useState([]);
-  const [selectedModel, setSelectedModel] = useState("qwen2.5:3b");
+  const [selectedModel, setSelectedModel] = useState("qwen3:8b");
   const [ollamaStatus, setOllamaStatus] = useState("online");
-  const [devMode, setDevMode] = useState(true);
+  const [devMode, setDevMode] = useState(false);
+
+  // Copied states (for tooltip/icon feedback)
+  const [copiedMsgId, setCopiedMsgId] = useState(null);
+  const [copiedCodeKey, setCopiedCodeKey] = useState(null);
 
   // File Upload states
-  const [attachedFile, setAttachedFile] = useState(null); // { name, summary, content }
+  const [attachedFile, setAttachedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  
+
   // Voice Input states
   const [recording, setRecording] = useState(false);
 
-  // Streaming cancel ref
-  const activeReaderRef = useRef(null);
+  // Smart Scrolling states & refs
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const [showScrollBottomBtn, setShowScrollBottomBtn] = useState(false);
+  const chatAreaRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+  const activeReaderRef = useRef(null);
   const fileInputRef = useRef(null);
 
   // --- Initialize Models and Conversations ---
@@ -72,9 +146,9 @@ export default function CopilotTab({ merchant }) {
     loadConversations();
   }, []);
 
-  // --- Auto update mode when merchant context changes ---
+  // --- Auto-switch to merchant mode when merchant context arrives ---
   useEffect(() => {
-    if (merchant) {
+    if (merchant?.merchant_id) {
       setMode("merchant");
     }
   }, [merchant?.merchant_id]);
@@ -88,15 +162,41 @@ export default function CopilotTab({ merchant }) {
     }
   }, [activeConvId]);
 
-  // --- Scroll to bottom ---
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingContent, loading]);
+  // --- Smart Scroll Management ---
+  const handleChatScroll = useCallback(() => {
+    if (!chatAreaRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatAreaRef.current;
+    const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+    const near = distanceToBottom < 90;
+    setIsNearBottom(near);
+    setShowScrollBottomBtn(!near && scrollHeight > clientHeight + 120);
+  }, []);
 
+  const scrollToBottom = (behavior = "smooth") => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior });
+    }
+  };
+
+  useEffect(() => {
+    if (isNearBottom) {
+      scrollToBottom("auto");
+    }
+  }, [messages, streamingContent, loading, isNearBottom]);
+
+  // --- Auto resize textarea ---
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+    }
+  }, [input]);
+
+  // --- API Handlers ---
   const loadModels = async (sync = false) => {
     try {
       const res = await getOllamaModels(sync);
-      setOllamaStatus(res.data.status);
+      setOllamaStatus(res.data.status || "online");
       setModels(res.data.models || []);
       if (res.data.active_default) {
         setSelectedModel(res.data.active_default);
@@ -111,11 +211,10 @@ export default function CopilotTab({ merchant }) {
       const res = await getConversations(search);
       const list = Array.isArray(res.data) ? res.data : [];
       setConversations(list);
-      // Auto select first conversation if none selected
       if (list.length > 0 && !activeConvId) {
         setActiveConvId(list[0].id);
-        setMode(list[0].mode);
-        setPersonality(list[0].personality);
+        setMode(list[0].mode || "general");
+        setPersonality(list[0].personality || "general");
         if (list[0].model_used) setSelectedModel(list[0].model_used);
       }
     } catch {
@@ -126,7 +225,9 @@ export default function CopilotTab({ merchant }) {
   const loadMessages = async (convId) => {
     try {
       const res = await getConversationMessages(convId);
-      setMessages(Array.isArray(res.data) ? res.data : []);
+      const data = res.data;
+      setMessages(Array.isArray(data) ? data : data.messages || []);
+      setTimeout(() => scrollToBottom("auto"), 50);
     } catch {
       setMessages([]);
     }
@@ -135,38 +236,44 @@ export default function CopilotTab({ merchant }) {
   const handleCreateChat = async () => {
     try {
       const payload = {
-        title: `Conversation ${conversations.length + 1}`,
+        title: "New Conversation",
         mode: mode,
         personality: personality,
         merchant_id: mode === "merchant" ? merchant?.merchant_id : null,
-        model_used: selectedModel
+        model_used: selectedModel,
       };
       const res = await createConversation(payload);
       setActiveConvId(res.data.id);
       loadConversations();
+      setInput("");
+      setAttachedFile(null);
+      if (textareaRef.current) textareaRef.current.focus();
     } catch (err) {
       console.error("Failed to create chat:", err);
     }
   };
 
-  const handleRenameChat = async (id, currentTitle) => {
-    const newTitle = prompt("Rename conversation thread:", currentTitle);
-    if (!newTitle || !newTitle.trim()) return;
+  const handleSaveRename = async (id) => {
+    if (!editingConvTitle.trim()) {
+      setEditingConvId(null);
+      return;
+    }
     try {
-      await renameConversation(id, newTitle.trim());
+      await renameConversation(id, editingConvTitle.trim());
+      setEditingConvId(null);
       loadConversations(searchQuery);
     } catch (err) {
-      console.error("Failed to rename chat:", err);
+      console.error("Failed to rename conversation:", err);
     }
   };
 
   const handleDeleteChat = async (e, id) => {
     e.stopPropagation();
-    if (!confirm("Are you sure you want to delete this chat thread?")) return;
     try {
       await deleteConversation(id);
       if (activeConvId === id) {
-        setActiveConvId(null);
+        const remaining = conversations.filter((c) => c.id !== id);
+        setActiveConvId(remaining.length > 0 ? remaining[0].id : null);
       }
       loadConversations(searchQuery);
     } catch (err) {
@@ -175,7 +282,7 @@ export default function CopilotTab({ merchant }) {
   };
 
   const handleClearHistory = async () => {
-    if (!confirm("Delete all persistent chat histories from database? This cannot be undone.")) return;
+    if (!window.confirm("Delete all conversations and persistent chat history?")) return;
     try {
       await clearConversations();
       setActiveConvId(null);
@@ -186,22 +293,63 @@ export default function CopilotTab({ merchant }) {
     }
   };
 
-  // --- SSE Chat Streaming & Stop Trigger ---
+  // --- Message Delete & Edit Handlers ---
+  const handleDeleteMessage = async (msgId) => {
+    if (!activeConvId) return;
+    try {
+      await deleteMessage(msgId, activeConvId);
+      setMessages((prev) => prev.filter((m) => m.id !== msgId));
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+    }
+  };
 
-  const handleSendMessage = async (textToSend = null) => {
-    let q = (textToSend || input).trim();
-    if (!q) return;
+  const handleStartEditMessage = (msg) => {
+    setEditingMsgId(msg.id);
+    setEditMsgContent(msg.content);
+  };
 
-    // Check if conversation exists, if not, create one first
+  const handleSaveEditAndResend = async (msgId) => {
+    if (!editMsgContent.trim()) return;
+    setEditingMsgId(null);
+    handleSendMessage(editMsgContent.trim(), { edit_message_id: msgId });
+  };
+
+  // --- Version Switcher for Regenerated Messages ---
+  const handleSwitchVersion = async (parentMsgId, direction) => {
+    if (!activeConvId) return;
+    try {
+      const res = await getMessageVersions(parentMsgId, activeConvId);
+      const versions = res.data || [];
+      if (versions.length <= 1) return;
+
+      const currentIdx = versions.findIndex((v) => v.is_current === 1);
+      let targetIdx = direction === "next" ? currentIdx + 1 : currentIdx - 1;
+      if (targetIdx < 0) targetIdx = versions.length - 1;
+      if (targetIdx >= versions.length) targetIdx = 0;
+
+      const targetMsg = versions[targetIdx];
+      await setMessageVersion(activeConvId, targetMsg.id);
+      loadMessages(activeConvId);
+    } catch (err) {
+      console.error("Failed to switch version:", err);
+    }
+  };
+
+  // --- SSE Chat Streaming & Stop Handling ---
+  const handleSendMessage = async (textToSend = null, options = {}) => {
+    let q = (textToSend !== null ? textToSend : input).trim();
+    if (!q && !options.regenerate) return;
+
     let currentConvId = activeConvId;
     if (!currentConvId) {
       try {
         const payload = {
-          title: q.slice(0, 20) + (q.length > 20 ? "..." : ""),
+          title: q.slice(0, 28) + (q.length > 28 ? "..." : ""),
           mode: mode,
           personality: personality,
           merchant_id: mode === "merchant" ? merchant?.merchant_id : null,
-          model_used: selectedModel
+          model_used: selectedModel,
         };
         const res = await createConversation(payload);
         currentConvId = res.data.id;
@@ -212,21 +360,28 @@ export default function CopilotTab({ merchant }) {
       }
     }
 
-    // Attach uploaded file context if present
-    if (attachedFile) {
-      q = `[File Uploaded: ${attachedFile.name}]\nFile Summary:\n${attachedFile.summary}\n\nUser Question:\n${q}`;
+    if (attachedFile && !options.regenerate) {
+      q = `[File Uploaded: ${attachedFile.name}]\nSummary:\n${attachedFile.summary}\n\nUser Question:\n${q}`;
     }
 
     setInput("");
     setAttachedFile(null);
     setLoading(true);
     setStreamingContent("");
-    
-    // Add user message to UI state instantly (optimistic update)
-    setMessages((prev) => [
-      ...prev,
-      { id: "temp-user", role: "user", content: textToSend || input, model_used: selectedModel }
-    ]);
+    setIsNearBottom(true);
+
+    if (!options.regenerate && !options.edit_message_id) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `temp-${Date.now()}`,
+          role: "user",
+          content: textToSend !== null ? textToSend : input,
+          timestamp: new Date().toISOString(),
+          model_used: selectedModel,
+        },
+      ]);
+    }
 
     try {
       const response = await fetch("http://127.0.0.1:8000/copilot/chat/stream", {
@@ -235,12 +390,18 @@ export default function CopilotTab({ merchant }) {
         body: JSON.stringify({
           conversation_id: currentConvId,
           question: q,
-          model_name: selectedModel
-        })
+          model_name: selectedModel,
+          personality: personality,
+          mode: mode,
+          merchant_id: mode === "merchant" ? merchant?.merchant_id : null,
+          regenerate: options.regenerate || false,
+          parent_message_id: options.parent_message_id || null,
+          edit_message_id: options.edit_message_id || null,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("HTTP error " + response.status);
+        throw new Error(`HTTP error ${response.status}`);
       }
 
       const reader = response.body.getReader();
@@ -255,54 +416,44 @@ export default function CopilotTab({ merchant }) {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
-        buffer = lines.pop(); // Hold remaining partial line
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
           if (line.startsWith("data: ")) {
             const dataStr = line.slice(6).trim();
             if (!dataStr) continue;
-
             try {
-              const payload = jsonParse(dataStr);
+              const payload = JSON.parse(dataStr);
               if (payload.token) {
                 fullContent += payload.token;
                 setStreamingContent(fullContent);
               }
               if (payload.event === "done" || payload.event === "stop") {
-                // Done event contains observability meta
                 break;
               }
-            } catch (e) {
-              // Ignore parse errors on partial streams
+            } catch {
+              // Ignore partial JSON parse errors
             }
           }
         }
       }
     } catch (err) {
-      console.error("Fetch stream error:", err);
+      console.error("Stream error:", err);
       setMessages((prev) => [
         ...prev,
-        { 
-          id: "temp-err", 
-          role: "assistant", 
-          content: "⚠️ Underwriting advisor service timed out or offline. Ensure Ollama is running (`ollama run qwen2.5:3b`) and try again." 
-        }
+        {
+          id: `err-${Date.now()}`,
+          role: "assistant",
+          content: "⚠️ Advisor AI could not connect to Ollama. Verify that Ollama daemon is running (`ollama serve`) and try again.",
+          timestamp: new Date().toISOString(),
+        },
       ]);
     } finally {
       activeReaderRef.current = null;
       setStreamingContent("");
       setLoading(false);
-      // Reload final persistent conversation ledger & message list
       loadConversations(searchQuery);
       loadMessages(currentConvId);
-    }
-  };
-
-  const jsonParse = (str) => {
-    try {
-      return JSON.parse(str);
-    } catch {
-      return {};
     }
   };
 
@@ -310,30 +461,42 @@ export default function CopilotTab({ merchant }) {
     if (activeReaderRef.current) {
       await activeReaderRef.current.cancel();
     }
-    try {
-      await stopChatGeneration(activeConvId, "Cancel Request", selectedModel);
-    } catch (err) {
-      console.error("Stop generation call failed:", err);
+    if (activeConvId) {
+      try {
+        await stopChatGeneration(activeConvId, "", selectedModel);
+      } catch (err) {
+        console.error("Stop generation call failed:", err);
+      }
     }
     setLoading(false);
   };
 
-  const handleRegenerate = async (lastUserMessage) => {
-    if (!lastUserMessage) return;
-    handleSendMessage(lastUserMessage);
+  const handleRegenerate = async (lastUserMsg) => {
+    if (!lastUserMsg) return;
+    handleSendMessage(lastUserMsg.content, {
+      regenerate: true,
+      parent_message_id: lastUserMsg.id,
+    });
   };
 
-  const handleDeleteMessage = async (msgId) => {
-    // Note: We can implement a message delete endpoint if needed, or simply delete locally.
-    // For local database simplicity, we can let user delete from UI or clear convo.
-    setMessages((prev) => prev.filter(m => m.id !== msgId));
+  // --- Copy Feedback Helpers ---
+  const handleCopyText = (id, text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedMsgId(id);
+    setTimeout(() => setCopiedMsgId(null), 2000);
   };
 
-  // --- Voice Input (Web Speech API) ---
+  const handleCopyCode = (key, code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCodeKey(key);
+    setTimeout(() => setCopiedCodeKey(null), 2000);
+  };
+
+  // --- Voice Input (Speech Recognition) ---
   const handleToggleVoice = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Voice input Speech Recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
+      alert("Speech recognition is not supported in this browser. Use Chrome, Edge, or Safari.");
       return;
     }
 
@@ -345,34 +508,19 @@ export default function CopilotTab({ merchant }) {
     const rec = new SpeechRecognition();
     rec.continuous = false;
     rec.interimResults = false;
-    rec.lang = "en-IN"; // English/Hindi combined detection
+    rec.lang = "en-US";
 
-    rec.onstart = () => {
-      setRecording(true);
-    };
-
+    rec.onstart = () => setRecording(true);
     rec.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInput((prev) => prev + (prev ? " " : "") + transcript);
     };
-
-    rec.onerror = (e) => {
-      console.error("Speech Recognition Error:", e);
-      setRecording(false);
-    };
-
-    rec.onend = () => {
-      setRecording(false);
-    };
-
+    rec.onerror = () => setRecording(false);
+    rec.onend = () => setRecording(false);
     rec.start();
   };
 
-  // --- File Upload Handler ---
-  const handleTriggerUpload = () => {
-    fileInputRef.current?.click();
-  };
-
+  // --- File Upload ---
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -384,303 +532,555 @@ export default function CopilotTab({ merchant }) {
         setAttachedFile({
           name: file.name,
           summary: res.data.parsed_summary,
-          content: res.data.text_content
+          content: res.data.text_content,
         });
       }
     } catch (err) {
-      alert("Failed to process file: " + (err.response?.data?.detail || err.message));
+      alert("Failed to parse file: " + (err.response?.data?.detail || err.message));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  // --- Helper to render custom markdown items ---
+  // --- Markdown Custom Renderers ---
   const markdownRenderComponents = {
-    p: ({ children }) => <p style={{ marginBottom: "8px", lineHeight: "1.6" }}>{children}</p>,
-    strong: ({ children }) => <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>{children}</strong>,
-    li: ({ children }) => <li style={{ marginLeft: "18px", marginBottom: "4px", listStyleType: "disc" }}>{children}</li>,
-    h1: ({ children }) => <h1 style={{ fontSize: "16px", fontWeight: 700, margin: "16px 0 8px", color: "var(--text-primary)" }}>{children}</h1>,
-    h2: ({ children }) => <h2 style={{ fontSize: "14px", fontWeight: 600, margin: "12px 0 6px", color: "var(--text-primary)" }}>{children}</h2>,
-    h3: ({ children }) => <h3 style={{ fontSize: "13px", fontWeight: 600, margin: "10px 0 4px", color: "var(--text-primary)" }}>{children}</h3>,
+    p: ({ children }) => <p className="chat-md-p">{children}</p>,
+    strong: ({ children }) => <strong className="chat-md-strong">{children}</strong>,
+    li: ({ children }) => <li className="chat-md-li">{children}</li>,
+    h1: ({ children }) => <h1 className="chat-md-h1">{children}</h1>,
+    h2: ({ children }) => <h2 className="chat-md-h2">{children}</h2>,
+    h3: ({ children }) => <h3 className="chat-md-h3">{children}</h3>,
     table: ({ children }) => (
-      <div style={{ overflowX: "auto", margin: "12px 0" }}>
-        <table className="data-table" style={{ width: "100%", fontSize: "12px" }}>{children}</table>
+      <div className="chat-md-table-wrap">
+        <table className="data-table" style={{ width: "100%", fontSize: "12px" }}>
+          {children}
+        </table>
       </div>
     ),
-    code({ node, inline, className, children, ...props }) {
-      const match = /language-(\w+)/.exec(className || '');
+    code({ inline, className, children, ...props }) {
+      const match = /language-(\w+)/.exec(className || "");
+      const lang = match ? match[1].toLowerCase() : "code";
+      const codeString = String(children).replace(/\n$/, "");
+      const codeKey = `${lang}-${codeString.slice(0, 20)}`;
+
       return !inline ? (
-        <div style={{ margin: "12px 0", background: "#0b0d14", border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 12px", background: "var(--bg-subtle)", borderBottom: "1px solid var(--border-subtle)", fontSize: "11px", color: "var(--text-tertiary)", fontFamily: "var(--font-sans)" }}>
-            <span>{match ? match[1].toUpperCase() : 'CODE'}</span>
-            <button 
-              onClick={() => {
-                navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
-                alert("Code copied to clipboard!");
-              }} 
-              style={{ background: "transparent", border: "none", color: "var(--text-secondary)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "11px" }}
+        <div className="chat-code-block">
+          <div className="chat-code-header">
+            <span className="chat-code-lang">{lang.toUpperCase()}</span>
+            <button
+              className="chat-code-copy-btn"
+              onClick={() => handleCopyCode(codeKey, codeString)}
+              title="Copy code"
             >
-              <Copy size={11} /> Copy
+              {copiedCodeKey === codeKey ? (
+                <>
+                  <Check size={11} color="var(--emerald-text)" />
+                  <span style={{ color: "var(--emerald-text)" }}>Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={11} />
+                  <span>Copy</span>
+                </>
+              )}
             </button>
           </div>
-          <pre style={{ padding: "12px", overflowX: "auto", margin: 0, fontFamily: "var(--font-mono)", fontSize: "12px", color: "#a6accd", lineHeight: "1.5" }}>
+          <pre className="chat-code-pre">
             <code>{children}</code>
           </pre>
         </div>
       ) : (
-        <code className={className} style={{ background: "var(--bg-subtle)", padding: "2px 4px", borderRadius: "3px", fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent-text)" }} {...props}>
+        <code className="chat-inline-code" {...props}>
           {children}
         </code>
       );
-    }
-  };
-
-  const getActiveSuggestions = () => {
-    return mode === "merchant" ? PROMPT_SUGGESTIONS_MERCHANT : PROMPT_SUGGESTIONS_GENERAL;
+    },
   };
 
   const getLastUserMessage = () => {
-    const userMsgs = messages.filter(m => m.role === "user");
-    return userMsgs.length > 0 ? userMsgs[userMsgs.length - 1].content : null;
+    const userMsgs = messages.filter((m) => m.role === "user");
+    return userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
+  };
+
+  const formatTimestamp = (ts) => {
+    if (!ts) return "";
+    try {
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } catch {
+      return "";
+    }
   };
 
   return (
-    <div className="copilot-layout">
-      {/* ─── SIDEBAR: CONVERSATION LEDGER ──────────────────────────── */}
-      <aside className="copilot-sidebar">
-        <div className="sidebar-header">
-          <span style={{ fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
-            Conversations
-          </span>
-          <button className="btn btn-sm btn-primary" onClick={handleCreateChat} style={{ padding: "3px 8px", borderRadius: "var(--radius-xs)" }}>
-            <Plus size={12} /> New Chat
+    <div className={`chatgpt-container ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"}`}>
+      {/* ─── SIDEBAR: PERSISTENT CONVERSATION LEDGER ──────────────── */}
+      <aside className="chatgpt-sidebar">
+        <div className="sidebar-top">
+          <button className="chatgpt-new-chat-btn" onClick={handleCreateChat}>
+            <Plus size={14} />
+            <span>New Chat</span>
+          </button>
+          <button
+            className="sidebar-toggle-btn"
+            onClick={() => setSidebarOpen(false)}
+            title="Collapse sidebar"
+          >
+            <ChevronLeft size={16} />
           </button>
         </div>
 
-        <div className="sidebar-search">
+        {/* Search Box */}
+        <div className="sidebar-search-container">
           <div className="sidebar-search-box">
-            <Search size={11} style={{ color: "var(--text-tertiary)" }} />
-            <input 
-              placeholder="Search chat..." 
+            <Search size={12} style={{ color: "var(--text-tertiary)" }} />
+            <input
+              placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 loadConversations(e.target.value);
               }}
             />
+            {searchQuery && (
+              <button
+                className="search-clear-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  loadConversations("");
+                }}
+              >
+                <X size={11} />
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="sidebar-list">
-          {conversations.map((c) => (
-            <div 
-              key={c.id} 
-              className={`sidebar-item${c.id === activeConvId ? " active" : ""}`}
-              onClick={() => {
-                setActiveConvId(c.id);
-                setMode(c.mode);
-                setPersonality(c.personality);
-                if (c.model_used) setSelectedModel(c.model_used);
-              }}
-            >
-              <div className="sidebar-item-title">{c.title}</div>
-              <div className="sidebar-item-meta">
-                <span>{c.mode === "merchant" ? "Merchant" : "General"}</span>
-                <span>{new Date(c.updated_at).toLocaleDateString()}</span>
+        {/* Conversation List */}
+        <div className="sidebar-thread-list">
+          {conversations.map((c) => {
+            const isActive = c.id === activeConvId;
+            const isEditing = c.id === editingConvId;
+
+            return (
+              <div
+                key={c.id}
+                className={`sidebar-thread-item ${isActive ? "active" : ""}`}
+                onClick={() => {
+                  if (!isEditing) {
+                    setActiveConvId(c.id);
+                    setMode(c.mode || "general");
+                    setPersonality(c.personality || "general");
+                    if (c.model_used) setSelectedModel(c.model_used);
+                  }
+                }}
+              >
+                {isEditing ? (
+                  <div className="thread-inline-edit" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      autoFocus
+                      value={editingConvTitle}
+                      onChange={(e) => setEditingConvTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveRename(c.id);
+                        if (e.key === "Escape") setEditingConvId(null);
+                      }}
+                    />
+                    <button
+                      className="inline-save-btn"
+                      onClick={() => handleSaveRename(c.id)}
+                      title="Save"
+                    >
+                      <Check size={12} />
+                    </button>
+                    <button
+                      className="inline-cancel-btn"
+                      onClick={() => setEditingConvId(null)}
+                      title="Cancel"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="thread-title-area">
+                      <span className="thread-title">{c.title || "Untitled Conversation"}</span>
+                      <div className="thread-meta">
+                        <span className="thread-tag">{c.mode === "merchant" ? "Merchant" : "General"}</span>
+                        <span>{new Date(c.updated_at).toLocaleDateString([], { month: "short", day: "numeric" })}</span>
+                      </div>
+                    </div>
+                    <div className="thread-actions">
+                      <button
+                        className="thread-action-btn"
+                        title="Rename"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingConvId(c.id);
+                          setEditingConvTitle(c.title);
+                        }}
+                      >
+                        <Edit2 size={11} />
+                      </button>
+                      <button
+                        className="thread-action-btn delete"
+                        title="Delete"
+                        onClick={(e) => handleDeleteChat(e, c.id)}
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="sidebar-item-actions">
-                <button className="sidebar-item-btn" title="Rename" onClick={() => handleRenameChat(c.id, c.title)}>
-                  <Edit2 size={11} />
-                </button>
-                <button className="sidebar-item-btn" title="Delete" onClick={(e) => handleDeleteChat(e, c.id)}>
-                  <Trash2 size={11} />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
+
           {conversations.length === 0 && (
-            <div style={{ textAlign: "center", color: "var(--text-tertiary)", fontSize: "11.5px", padding: "20px 10px" }}>
-              No previous threads found. Click New Chat.
+            <div className="sidebar-empty">
+              <Sparkles size={20} style={{ opacity: 0.4, marginBottom: 8 }} />
+              <p>No chat history</p>
+              <span>Click New Chat to begin</span>
             </div>
           )}
         </div>
 
+        {/* Sidebar Footer */}
         {conversations.length > 0 && (
-          <div style={{ padding: 10, borderTop: "1px solid var(--border-subtle)", textAlign: "center" }}>
-            <button className="message-action-btn" onClick={handleClearHistory} style={{ margin: "0 auto", color: "var(--rose-text)" }}>
-              <Trash2 size={11} /> Clear Thread History
+          <div className="sidebar-footer">
+            <button className="sidebar-clear-btn" onClick={handleClearHistory}>
+              <Trash2 size={12} /> Clear all history
             </button>
           </div>
         )}
       </aside>
 
-      {/* ─── MAIN WORKSPACE: CHAT PLATFORM ────────────────────────── */}
-      <main className="copilot-workspace">
-        {/* Workspace Controls Header */}
-        <div className="workspace-header">
-          <div className="workspace-controls">
-            {/* Mode Switcher */}
-            <div className="control-toggle-wrap">
-              <button 
-                className={`control-toggle-btn${mode === "merchant" ? " active" : ""}`}
+      {/* ─── MAIN WORKSPACE ────────────────────────────────────────── */}
+      <main className="chatgpt-main">
+        {/* Workspace Top Navigation / Controls */}
+        <header className="chatgpt-header">
+          <div className="header-left">
+            {!sidebarOpen && (
+              <button
+                className="header-icon-btn"
+                onClick={() => setSidebarOpen(true)}
+                title="Expand sidebar"
+              >
+                <Menu size={16} />
+              </button>
+            )}
+
+            {/* Mode Switcher Pills */}
+            <div className="mode-pill-toggle">
+              <button
+                className={`mode-pill ${mode === "merchant" ? "active" : ""}`}
                 onClick={() => {
                   if (mode !== "merchant" && !merchant) {
-                    alert("Please select a merchant first from the top search bar to use Merchant Mode.");
+                    alert("Please select a merchant from the top search bar first.");
                     return;
                   }
                   setMode("merchant");
                 }}
               >
-                Merchant Intelligence
+                <Shield size={12} /> Merchant Intelligence
               </button>
-              <button 
-                className={`control-toggle-btn${mode === "general" ? " active" : ""}`}
+              <button
+                className={`mode-pill ${mode === "general" ? "active" : ""}`}
                 onClick={() => setMode("general")}
               >
-                General AI
+                <Compass size={12} /> General AI
               </button>
             </div>
 
             {/* Personality Selector */}
-            <select 
-              className="control-select"
+            <select
+              className="chat-select"
               value={personality}
-              onChange={async (e) => {
-                const val = e.target.value;
-                setPersonality(val);
-                if (activeConvId) {
-                  // Auto create a new thread or update active convo settings in future endpoints
-                }
-              }}
+              onChange={(e) => setPersonality(e.target.value)}
+              title="Advisor Persona"
             >
-              {PERSONALITIES.map(p => (
-                <option key={p.id} value={p.id}>{p.label}</option>
+              {PERSONALITIES.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
               ))}
             </select>
           </div>
 
-          <div className="workspace-controls">
-            {/* Model Dropdown */}
-            <select 
-              className="control-select"
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              title={`Ollama server: ${ollamaStatus}`}
-              style={{ borderColor: ollamaStatus === "offline" ? "var(--rose-border)" : "var(--border)" }}
-            >
-              {models.map(m => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-              {models.length === 0 && (
-                <option value="qwen2.5:3b">qwen2.5:3b (Offline)</option>
-              )}
-            </select>
+          <div className="header-right">
+            {/* Model Selector & Status Badge */}
+            <div className="model-selector-wrap">
+              <span
+                className={`status-dot ${ollamaStatus === "online" ? "online" : "offline"}`}
+                title={`Ollama: ${ollamaStatus}`}
+              />
+              <select
+                className="chat-select model-select"
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                title="Active Local LLM"
+              >
+                {models.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+                {models.length === 0 && (
+                  <option value="qwen3:8b">qwen3:8b (Offline)</option>
+                )}
+              </select>
+              <button
+                className="header-sync-btn"
+                onClick={() => loadModels(true)}
+                title="Sync local models from Ollama daemon"
+              >
+                Sync
+              </button>
+            </div>
 
-            <button
-              className="btn btn-sm"
-              onClick={() => {
-                alert("Auto-detecting installed local Ollama models...");
-                loadModels(true);
-              }}
-              style={{ fontSize: "10px", padding: "4px 8px", minWidth: "50px" }}
-              title="Click to fetch live models from Ollama daemon"
-            >
-              Sync
-            </button>
-
-            {/* Export options */}
+            {/* Export Dropdown */}
             {activeConvId && messages.length > 0 && (
-              <div style={{ display: "flex", gap: 4 }}>
-                <a className="btn btn-sm" href={getExportUrl(activeConvId, "md")} target="_blank" rel="noreferrer" title="Export Markdown">
+              <div className="export-group">
+                <a
+                  className="header-btn"
+                  href={getExportUrl(activeConvId, "md")}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Export Markdown"
+                >
                   <Download size={11} /> MD
                 </a>
-                <a className="btn btn-sm" href={getExportUrl(activeConvId, "pdf")} target="_blank" rel="noreferrer" title="Export PDF">
+                <a
+                  className="header-btn"
+                  href={getExportUrl(activeConvId, "pdf")}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Export PDF"
+                >
                   PDF
                 </a>
               </div>
             )}
-            
-            {/* Developer Mode checkbox */}
-            <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "11px", color: "var(--text-tertiary)", cursor: "pointer" }}>
-              <input type="checkbox" checked={devMode} onChange={(e) => setDevMode(e.target.checked)} />
-              Dev Metrics
+
+            {/* Dev Metrics Toggle */}
+            <label className="dev-metrics-toggle" title="Show token speeds and agent traces">
+              <input
+                type="checkbox"
+                checked={devMode}
+                onChange={(e) => setDevMode(e.target.checked)}
+              />
+              <span>Dev Metrics</span>
             </label>
           </div>
-        </div>
+        </header>
 
-        {/* Conversation Logs */}
-        <div className="copilot-chat-area">
-          {/* Active Context Banner */}
-          {mode === "merchant" && merchant && (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--accent-subtle)", border: "1px solid rgba(99, 102, 241, 0.15)", borderRadius: "var(--radius)", padding: "10px 14px", fontSize: "12px", color: "var(--text-primary)" }}>
-              <Sparkles size={14} color="var(--accent-text)" />
-              <div>
-                Grounded in active merchant: <strong style={{ color: "var(--accent-text)" }}>{merchant.merchant_name || merchant.merchant_id}</strong> ({merchant.merchant_id}). 
-                Risk Score: <strong>{riskScore.toFixed(1)}</strong> | Success Rate: <strong>{Number(merchant.success_rate).toFixed(1)}%</strong>.
+        {/* Active Merchant Context Banner */}
+        {mode === "merchant" && merchant && (
+          <div className="merchant-context-banner">
+            <div className="merchant-banner-content">
+              <Sparkles size={14} className="banner-sparkle" />
+              <span>
+                Grounded in: <strong>{merchant.merchant_name || merchant.merchant_id}</strong> ({merchant.merchant_id}) | Risk Score:{" "}
+                <strong>{riskScore.toFixed(1)}/100</strong> | Auth Rate:{" "}
+                <strong>{Number(merchant.success_rate || 0).toFixed(1)}%</strong> | GMV:{" "}
+                <strong>INR {Number(merchant.total_revenue || 0).toLocaleString()}</strong>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* ─── CHAT MESSAGES SCROLL AREA ───────────────────────────── */}
+        <div
+          className="chatgpt-scroll-area"
+          ref={chatAreaRef}
+          onScroll={handleChatScroll}
+        >
+          {/* Welcome Screen / Empty State */}
+          {messages.length === 0 && !streamingContent && !loading && (
+            <div className="chatgpt-welcome-screen">
+              <div className="welcome-hero">
+                <div className="welcome-avatar-glow">
+                  <Bot size={28} color="var(--accent-text)" />
+                </div>
+                <h2>RazorMind Advisor AI</h2>
+                <p>
+                  Your ChatGPT-class assistant for real-time merchant analytics, risk attribution,
+                  predictive forecasting, and general multi-turn reasoning.
+                </p>
+              </div>
+
+              <div className="starter-grid">
+                {STARTER_CATEGORIES.map((cat, idx) => (
+                  <div key={idx} className="starter-category-card">
+                    <div className="category-header">
+                      <cat.icon size={15} style={{ color: cat.color }} />
+                      <span>{cat.category}</span>
+                    </div>
+                    <div className="starter-prompts-list">
+                      {cat.prompts.map((p, pIdx) => (
+                        <button
+                          key={pIdx}
+                          className="starter-prompt-btn"
+                          onClick={() => handleSendMessage(p)}
+                        >
+                          <span>{p}</span>
+                          <CornerDownLeft size={11} className="prompt-arrow" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Render Messages */}
+          {/* Rendered Messages */}
           {messages.map((msg) => {
             const isUser = msg.role === "user";
+            const isEditing = editingMsgId === msg.id;
+
             return (
-              <div key={msg.id} className={`copilot-msg-row ${msg.role}`}>
-                <div className="copilot-avatar">
-                  {isUser ? <User size={13} color="var(--text-secondary)" /> : <Bot size={13} color="var(--accent-text)" />}
+              <div key={msg.id} className={`chat-message-row ${msg.role}`}>
+                <div className="chat-avatar">
+                  {isUser ? (
+                    <User size={14} color="var(--text-secondary)" />
+                  ) : (
+                    <Bot size={14} color="var(--accent-text)" />
+                  )}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", maxWidth: "90%" }}>
-                  <div className="copilot-bubble">
-                    <ReactMarkdown components={markdownRenderComponents}>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
-                  
-                  {/* Actions & Observability Row for Assistant */}
-                  {!isUser && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <div className="message-actions-row">
-                        <button 
-                          className="message-action-btn" 
-                          onClick={() => {
-                            navigator.clipboard.writeText(msg.content);
-                            alert("Response text copied!");
-                          }}
+
+                <div className="chat-bubble-container">
+                  {isEditing ? (
+                    <div className="inline-message-editor">
+                      <textarea
+                        value={editMsgContent}
+                        onChange={(e) => setEditMsgContent(e.target.value)}
+                        rows={3}
+                      />
+                      <div className="editor-action-row">
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleSaveEditAndResend(msg.id)}
                         >
-                          <Copy size={10} /> Copy
+                          Save & Submit
                         </button>
-                        <button 
-                          className="message-action-btn" 
-                          onClick={() => handleRegenerate(getLastUserMessage())}
-                          disabled={loading}
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => setEditingMsgId(null)}
                         >
-                          <RotateCcw size={10} /> Regenerate
-                        </button>
-                        <button 
-                          className="message-action-btn" 
-                          onClick={() => handleDeleteMessage(msg.id)}
-                          style={{ color: "var(--rose-text)" }}
-                        >
-                          <Trash2 size={10} /> Delete
+                          Cancel
                         </button>
                       </div>
+                    </div>
+                  ) : (
+                    <div className="chat-bubble">
+                      <ReactMarkdown components={markdownRenderComponents}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
 
-                      {/* Agent Visibility Panel */}
-                      {msg.agents_consulted && msg.agents_consulted.length > 0 && (
-                        <div className="agent-visibility-panel">
-                          {msg.agents_consulted.map(agent => (
-                            <span key={agent} className="agent-visibility-tag">✓ {agent} consulted</span>
-                          ))}
-                        </div>
-                      )}
+                  {/* Actions Bar */}
+                  <div className="chat-actions-bar">
+                    {msg.timestamp && (
+                      <span className="chat-timestamp">{formatTimestamp(msg.timestamp)}</span>
+                    )}
 
-                      {/* Observability Badge */}
-                      {devMode && msg.tokens && (
-                        <span className="observability-badge">
-                          Latency: {Number(msg.latency || 0).toFixed(2)}s | Generated Tokens: {msg.tokens} | Model: {msg.model_used || selectedModel} | Speed: {((msg.tokens) / max1(msg.latency)).toFixed(1)} tokens/sec
+                    {isUser && !isEditing && (
+                      <button
+                        className="chat-action-icon-btn"
+                        onClick={() => handleStartEditMessage(msg)}
+                        title="Edit message"
+                      >
+                        <Edit2 size={11} />
+                        <span>Edit</span>
+                      </button>
+                    )}
+
+                    {!isUser && (
+                      <>
+                        <button
+                          className="chat-action-icon-btn"
+                          onClick={() => handleCopyText(msg.id, msg.content)}
+                          title="Copy message"
+                        >
+                          {copiedMsgId === msg.id ? (
+                            <>
+                              <Check size={11} color="var(--emerald-text)" />
+                              <span style={{ color: "var(--emerald-text)" }}>Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={11} />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          className="chat-action-icon-btn"
+                          onClick={() => handleRegenerate(getLastUserMessage())}
+                          disabled={loading}
+                          title="Regenerate reply"
+                        >
+                          <RotateCcw size={11} />
+                          <span>Regenerate</span>
+                        </button>
+
+                        {/* Version switcher if multi-version assistant replies exist */}
+                        {msg.version && msg.version > 1 && (
+                          <div className="version-switcher">
+                            <button
+                              onClick={() => handleSwitchVersion(msg.parent_id || msg.id, "prev")}
+                              title="Previous version"
+                            >
+                              <ChevronLeft size={11} />
+                            </button>
+                            <span>v{msg.version}</span>
+                            <button
+                              onClick={() => handleSwitchVersion(msg.parent_id || msg.id, "next")}
+                              title="Next version"
+                            >
+                              <ChevronRight size={11} />
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <button
+                      className="chat-action-icon-btn delete-btn"
+                      onClick={() => handleDeleteMessage(msg.id)}
+                      title="Delete message"
+                    >
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
+
+                  {/* Multi-Agent Consultation Tags */}
+                  {!isUser && msg.agents_consulted && msg.agents_consulted.length > 0 && (
+                    <div className="agent-consulted-tags">
+                      {msg.agents_consulted.map((agent, aIdx) => (
+                        <span key={aIdx} className="agent-tag">
+                          ✓ {agent}
                         </span>
-                      )}
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Dev Metrics Badge */}
+                  {!isUser && devMode && msg.tokens && (
+                    <div className="chat-dev-badge">
+                      <span>Latency: {Number(msg.latency || 0).toFixed(2)}s</span>
+                      <span>•</span>
+                      <span>Tokens: {msg.tokens}</span>
+                      <span>•</span>
+                      <span>Model: {msg.model_used || selectedModel}</span>
+                      <span>•</span>
+                      <span>
+                        Speed: {(msg.tokens / Math.max(0.01, Number(msg.latency || 0.01))).toFixed(1)} t/s
+                      </span>
                     </div>
                   )}
                 </div>
@@ -688,142 +1088,154 @@ export default function CopilotTab({ merchant }) {
             );
           })}
 
-          {/* Render Streaming response chunk */}
+          {/* Active Token Stream Chunk */}
           {streamingContent && (
-            <div className="copilot-msg-row assistant">
-              <div className="copilot-avatar">
-                <Bot size={13} color="var(--accent-text)" />
+            <div className="chat-message-row assistant streaming">
+              <div className="chat-avatar">
+                <Bot size={14} color="var(--accent-text)" />
               </div>
-              <div className="copilot-bubble" style={{ maxWidth: "90%" }}>
-                <ReactMarkdown components={markdownRenderComponents}>
-                  {streamingContent}
-                </ReactMarkdown>
+              <div className="chat-bubble-container">
+                <div className="chat-bubble">
+                  <ReactMarkdown components={markdownRenderComponents}>
+                    {streamingContent}
+                  </ReactMarkdown>
+                  <span className="streaming-cursor">▊</span>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Loader */}
+          {/* Typing Wave / Reasoning Indicator */}
           {loading && !streamingContent && (
-            <div className="copilot-msg-row assistant">
-              <div className="copilot-avatar">
-                <Bot size={13} color="var(--accent-text)" />
+            <div className="chat-message-row assistant">
+              <div className="chat-avatar">
+                <Bot size={14} color="var(--accent-text)" />
               </div>
-              <div className="copilot-bubble" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span className="spinner" />
-                <span style={{ fontSize: "11.5px", color: "var(--text-tertiary)" }}>
-                  Advisor AI resolving diagnostics & model reasoning...
-                </span>
+              <div className="chat-bubble-container">
+                <div className="typing-indicator-bubble">
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-dot" />
+                  <span className="typing-text">Advisor AI is reasoning...</span>
+                </div>
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggestion Chips */}
-        {!loading && messages.length > 0 && (
-          <div style={{ display: "flex", gap: 6, overflowX: "auto", padding: "8px 16px", background: "var(--bg-app)", borderTop: "1px solid var(--border-subtle)" }}>
-            {getActiveSuggestions().map((p, i) => (
-              <button
-                key={i}
-                className="btn btn-sm"
-                style={{ fontSize: "11px", whiteSpace: "nowrap", borderRadius: "var(--radius-xs)" }}
-                onClick={() => handleSendMessage(p)}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
+        {/* Floating Scroll to Bottom Button */}
+        {showScrollBottomBtn && (
+          <button
+            className="floating-scroll-bottom-btn"
+            onClick={() => scrollToBottom("smooth")}
+            title="Scroll to bottom"
+          >
+            <ChevronDown size={15} />
+          </button>
         )}
 
-        {/* Upload & Voice Input Panel */}
-        <div style={{ display: "flex", flexDirection: "column", borderTop: "1px solid var(--border)", background: "var(--bg-surface)", padding: "10px 16px" }}>
-          
-          {/* File Attachment Status Bar */}
+        {/* ─── CHAT COMPOSER / INPUT AREA ──────────────────────────── */}
+        <div className="chatgpt-composer-container">
+          {/* File Attachment Chip */}
           {attachedFile && (
-            <div style={{ marginBottom: 8 }} className="file-attachment-chip">
-              <span>📁 {attachedFile.name} (Ready)</span>
-              <button className="file-attachment-close" onClick={() => setAttachedFile(null)}>×</button>
+            <div className="composer-file-chip">
+              <Paperclip size={12} />
+              <span className="file-name">{attachedFile.name}</span>
+              <button
+                className="file-remove-btn"
+                onClick={() => setAttachedFile(null)}
+                title="Remove attached file"
+              >
+                <X size={12} />
+              </button>
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            {/* Attachment Button */}
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileUpload} 
+          {/* Composer Input Box */}
+          <div className="composer-box">
+            {/* File upload hidden input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
               style={{ display: "none" }}
               accept=".txt,.pdf,.csv,.xlsx"
             />
-            <button 
-              className="btn" 
-              onClick={handleTriggerUpload}
-              disabled={loading || uploading}
-              style={{ height: "34px", width: "34px", padding: 0 }}
-              title="Attach File (TXT, PDF, CSV, XLSX)"
-            >
-              {uploading ? <span className="spinner" style={{ width: 12, height: 12 }} /> : <Paperclip size={13} />}
-            </button>
 
-            {/* Voice Input Button */}
-            <button 
-              className="btn"
-              onClick={handleToggleVoice}
-              disabled={loading}
-              style={{ 
-                height: "34px", width: "34px", padding: 0,
-                color: recording ? "var(--rose-text)" : "var(--text-primary)",
-                borderColor: recording ? "var(--rose-border)" : "var(--border)",
-                background: recording ? "var(--rose-subtle)" : "var(--bg-elevated)"
-              }}
-              title={recording ? "Recording... Click to stop" : "Voice Input (Speech-to-Text)"}
-            >
-              <Mic size={13} className={recording ? "pulse" : ""} />
-            </button>
+            {/* Left Action Buttons */}
+            <div className="composer-left-actions">
+              <button
+                className="composer-icon-btn"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading || uploading}
+                title="Attach Document (TXT, PDF, CSV, XLSX)"
+              >
+                {uploading ? <span className="spinner" style={{ width: 12, height: 12 }} /> : <Paperclip size={15} />}
+              </button>
 
-            {/* Main Text Input */}
-            <input
-              style={{
-                flex: 1, background: "var(--bg-input)", border: "1px solid var(--border)",
-                borderRadius: "var(--radius-sm)", padding: "0 12px", color: "var(--text-primary)",
-                fontSize: "12.5px", outline: "none", height: "34px", fontFamily: "var(--font-sans)"
-              }}
+              <button
+                className={`composer-icon-btn ${recording ? "recording" : ""}`}
+                onClick={handleToggleVoice}
+                disabled={loading}
+                title={recording ? "Recording... Click to stop" : "Voice Input (Speech-to-Text)"}
+              >
+                <Mic size={15} className={recording ? "pulse" : ""} />
+              </button>
+            </div>
+
+            {/* Auto-growing Textarea */}
+            <textarea
+              ref={textareaRef}
+              rows={1}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
-              placeholder={mode === "merchant" && merchant 
-                ? `Ask underwriting advisor about ${merchant.merchant_name || merchant.merchant_id}...` 
-                : "Ask general AI questions (coding, machine learning, business)..."}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (!loading && (input.trim() || attachedFile)) {
+                    handleSendMessage();
+                  }
+                }
+              }}
+              placeholder={
+                mode === "merchant" && merchant
+                  ? `Ask about ${merchant.merchant_name || merchant.merchant_id} (risk, churn, revenue, forecast)...`
+                  : "Message Advisor AI (coding, architecture, questions)..."
+              }
               disabled={loading}
             />
 
             {/* Send / Stop Buttons */}
-            {loading ? (
-              <button 
-                className="btn btn-primary"
-                onClick={handleStopGenerating}
-                style={{ height: "34px", background: "var(--rose)", borderColor: "var(--rose)" }}
-                title="Stop Generating"
-              >
-                <StopCircle size={13} /> Stop
-              </button>
-            ) : (
-              <button 
-                className="btn btn-primary"
-                onClick={() => handleSendMessage()}
-                disabled={!input.trim() && !attachedFile}
-                style={{ height: "34px" }}
-              >
-                <Send size={13} />
-              </button>
-            )}
+            <div className="composer-right-actions">
+              {loading ? (
+                <button
+                  className="composer-stop-btn"
+                  onClick={handleStopGenerating}
+                  title="Stop generating"
+                >
+                  <StopCircle size={15} />
+                  <span>Stop</span>
+                </button>
+              ) : (
+                <button
+                  className={`composer-send-btn ${input.trim() || attachedFile ? "ready" : ""}`}
+                  onClick={() => handleSendMessage()}
+                  disabled={!input.trim() && !attachedFile}
+                  title="Send message (Enter)"
+                >
+                  <Send size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="composer-disclaimer">
+            Advisor AI is powered by local LLMs and RazorMind multi-agent telemetry. Shift+Enter for new line.
           </div>
         </div>
       </main>
     </div>
   );
 }
-
-// Simple safely bounded max helpers to avoid Math errors in render
-const max1 = (v) => Math.max(0.01, Number(v || 0.01));

@@ -5,10 +5,25 @@ from backend.services.risk_service import risk_service
 from backend.services.forecast_service import forecast_service
 from backend.services.churn_service import churn_service
 from backend.services.merchant_context import get_merchant_snapshot
+from backend.services.copilot_context_service import copilot_context_service
 
 class RAGService:
     @staticmethod
-    def retrieve_merchant_context(merchant_id: str) -> dict:
+    def retrieve_merchant_context(merchant_id: str, query: str = "", mode: str = "general", dashboard: dict = None, debug: bool = False) -> dict:
+        """
+        Full project-aware ledger for Advisor. Delegates to CopilotContextService
+        (live risk, churn, twin, traces, platform map, and intent routing) with a Postgres fallback.
+        """
+        try:
+            built = copilot_context_service.build(merchant_id, query=query, mode=mode, dashboard=dashboard, debug=debug)
+            if built.get("formatted_text"):
+                return built
+        except Exception:
+            pass
+        return RAGService._legacy_retrieve(merchant_id)
+
+    @staticmethod
+    def _legacy_retrieve(merchant_id: str) -> dict:
         """
         Retrieves the complete risk ledger, monthly forecasts, multi-agent decisions, 
         and action plans for a merchant from PostgreSQL databases to construct the RAG context.
