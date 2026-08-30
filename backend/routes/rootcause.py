@@ -16,6 +16,7 @@ def get_root_cause_analysis(merchant_id: str):
             "merchant_id": merchant_id,
             "primary_bottleneck": rc.get("primary_bottleneck"),
             "diagnosed_issues": rc.get("diagnosed_issues", []),
+            "estimated_monthly_loss": rc.get("estimated_monthly_loss", 0),
             "kpi_benchmarks": kpi.get("kpi_metrics", {}),
             "operational_grade": kpi.get("operational_grade"),
             "confidence_score": rc.get("confidence_score")

@@ -255,7 +255,7 @@ export default function OverviewTab({ merchant }) {
                     </span>
                   </td>
                   <td style={{ fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                    {a.confidence_score != null ? `${Number(a.confidence_score).toFixed(0)}%` : "—"}
+                    {a.confidence_score != null ? `${Number(a.confidence_score).toFixed(1)}%` : "—"}
                   </td>
                   <td style={{ fontSize: 11.5, color: "var(--text-tertiary)" }}>
                     {a.created_at ? new Date(a.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : "Just now"}

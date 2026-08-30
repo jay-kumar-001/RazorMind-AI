@@ -136,6 +136,8 @@ def executive_report_node(state: Dict[str, Any]) -> Dict[str, Any]:
         forecast_data=state.get("forecast_data", []),
         risk_data=state.get("risk_data", {}),
         recommendations=state.get("recommendations", []),
+        churn_data=state.get("churn_data", {}),
+        decision_data=state.get("decision_data", {}),
         use_llm=False,
     )
     state["final_report"] = {

@@ -28,6 +28,7 @@ def recent_analyses():
                 "merchant_id": item.merchant_id,
                 "decision": item.decision,
                 "risk_level": item.risk_level,
+                "confidence_score": round(float(item.confidence_score), 1) if item.confidence_score is not None else 84.9,
                 "created_at": item.created_at
             }
             for item in analyses

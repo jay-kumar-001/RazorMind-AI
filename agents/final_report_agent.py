@@ -27,9 +27,8 @@ def final_report_agent(merchant_id: str) -> Dict[str, Any]:
         churn = churn_agent(merchant_id)
         kpi = kpi_agent(merchant_id)
         rc = rootcause_agent(merchant_id)
-        recs = recommendation_agent(merchant_id)
-        dec = decision_agent(risk, fc, merchant_id=merchant_id)
-        exec_rep = executive_report_agent(rev, fc, risk, recs)
+        dec = decision_agent(risk, fc, merchant_id=merchant_id, churn=churn)
+        exec_rep = executive_report_agent(rev, fc, risk, recs, churn_data=churn, decision_data=dec)
         act_plan = action_plan_agent(merchant_id, risk.get("risk_level", "LOW"), recs)
 
         exec_time = time.time() - start_time

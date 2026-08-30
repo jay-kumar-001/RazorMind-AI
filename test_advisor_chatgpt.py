@@ -60,7 +60,7 @@ def test_advisor_chatgpt_suite():
         "mode": "merchant",
         "personality": "risk",
         "merchant_id": "M0001",
-        "model_used": "qwen3:8b"
+        "model_used": "qwen2.5:3b"
     }
     res = client.post("/copilot/conversations", json=create_payload)
     print("POST /copilot/conversations ->", res.status_code)

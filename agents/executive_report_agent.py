@@ -11,24 +11,34 @@ def generate_investor_grade_report(
     revenue_data: dict,
     forecast_data: list,
     risk_data: dict,
-    recommendations: list
+    recommendations: list,
+    churn_data: dict = None,
+    decision_data: dict = None,
 ) -> str:
     m_id = revenue_data.get("merchant_id", "Unknown")
-    rev = float(revenue_data.get("total_revenue") or 0.0)
+    total_rev = float(revenue_data.get("total_revenue") or 0.0)
+    monthly_rev = round(total_rev / 3.0, 2)
     succ = float(revenue_data.get("success_rate") or 0.0)
     ref = float(revenue_data.get("refund_rate") or 0.0)
     risk_lvl = risk_data.get("risk_level", "LOW")
     risk_score = float(risk_data.get("risk_score") or 0.0)
-    conf = float(risk_data.get("confidence_score") or 70.0)
+    churn_p = float((churn_data or {}).get("churn_probability") or 0.0)
+
+    # Derived confidence: weighted average across upstream specialist models (not hardcoded)
+    risk_conf = float((risk_data or {}).get("confidence_score") or 75.0)
+    fc_conf = float(((forecast_data[0] if forecast_data else {})).get("confidence_score") or 75.0)
+    churn_conf = float((churn_data or {}).get("confidence_score") or 75.0)
+    conf = round((risk_conf * 0.40 + fc_conf * 0.35 + churn_conf * 0.25), 1)
 
     if forecast_data:
         avg_forecast = sum(f["predicted_revenue"] for f in forecast_data) / len(forecast_data)
-        growth_3mo = round(((forecast_data[-1]["predicted_revenue"] - rev) / max(rev, 1.0)) * 100.0, 1)
+        growth_3mo = round(((forecast_data[-1]["predicted_revenue"] - total_rev) / max(total_rev, 1.0)) * 100.0, 1)
     else:
-        avg_forecast = rev
+        avg_forecast = monthly_rev
         growth_3mo = 0.0
 
     rec_bullets = "\n".join([f"- {r}" for r in recommendations[:4]])
+    final_decision = (decision_data or {}).get("final_decision") or ("APPROVE" if risk_score <= 35 and churn_p < 40 else ("APPROVE WITH MONITORING" if risk_score <= 55 else "MONITOR CLOSELY"))
 
     return f"""### RazorMind AI Executive Merchant Intelligence Report
 
@@ -37,21 +47,23 @@ def generate_investor_grade_report(
 ---
 
 #### 1. Executive Summary
-Merchant `{m_id}` maintains a **{risk_lvl}** operational risk posture with an aggregate underwriting health index of **{100 - risk_score:.1f}/100**. Gross transaction throughput stands at **INR {rev:,.0f}/month**, demonstrating stable payment velocity and controlled dispute exposure across primary card networks and digital payment rails.
+Merchant `{m_id}` maintains a **{risk_lvl}** operational risk posture with an aggregate underwriting health index of **{100 - risk_score:.1f}/100**. Gross transaction throughput stands at **INR {total_rev:,.2f}** over 3 months, demonstrating stable payment velocity and controlled dispute exposure across primary card networks and digital payment rails.
 
 #### 2. Revenue Insights & Throughput Velocity
-- **Gross Monthly Processing Run-Rate**: INR {rev:,.0f}
-- **Net Realized Cashflow (Excluding Refunds)**: INR {rev * (1 - ref/100):,.0f}
-- **Average Ticket Value (AOV)**: INR {float(revenue_data.get('avg_order_value') or 0):,.0f}
+- **3M Aggregate Revenue**: INR {total_rev:,.2f}
+- **Monthly Revenue (calculated from 3-month average)**: INR {monthly_rev:,.2f}
+- **Net Realized Cashflow (Excluding Refunds)**: INR {monthly_rev * (1 - ref/100):,.2f}
+- **Average Ticket Value (AOV)**: INR {float(revenue_data.get('avg_order_value') or 0):,.2f}
 - **Authorization Success Rate**: {succ:.2f}% ({'Optimal processing efficiency' if succ >= 92 else 'Authorization optimization recommended'})
 
 #### 3. Risk Assessment & Fraud Signal Exposure
 - **Composite Risk Score**: `{risk_score:.1f} / 100` (Category: `{risk_lvl}`)
+- **Predictive Churn Risk**: `{churn_p:.1f}%` (60-day merchant dropoff index)
 - **Refund & Chargeback Velocity**: `{ref:.2f}%` (Underwriting ceiling: 2.0%)
 - **Diagnostic Finding**: {risk_data.get('explanation', 'Merchant demonstrates consistent payment behavior with balanced settlement cycles.')}
 
 #### 4. Growth Outlook & 90-Day Forecast Trajectory
-- **Projected 3-Month Average Revenue**: `INR {avg_forecast:,.0f}`
+- **Projected 3-Month Average Revenue**: `INR {avg_forecast:,.2f}`
 - **Quarterly Trajectory Momentum**: `{'+' if growth_3mo >= 0 else ''}{growth_3mo}%`
 - **Interval method**: OLS residual 95% band from forecast engine (widens with horizon).
 
@@ -59,10 +71,10 @@ Merchant `{m_id}` maintains a **{risk_lvl}** operational risk posture with an ag
 {rec_bullets}
 
 #### 6. Final Underwriting Decision
-**Decision**: `{"APPROVE" if risk_score <= 35 else ("APPROVE WITH MONITORING" if risk_score <= 55 else "MONITOR CLOSELY")}`
+**Decision**: `{final_decision}`
 - **Supervision Frequency**: Quarterly automated review
 - **Settlement Terms**: T+1 Standard Settlement Eligible
-- **Confidence Score**: `{conf:.1f}%`
+- **Derived Committee Confidence**: `{conf:.1f}%`
 """
 
 def executive_report_agent(
@@ -70,20 +82,58 @@ def executive_report_agent(
     forecast_data: List[Dict[str, Any]],
     risk_data: Dict[str, Any],
     recommendations: List[str],
+    churn_data: Dict[str, Any] = None,
+    decision_data: Dict[str, Any] = None,
     use_llm: bool = True,
 ) -> str:
     start_time = time.time()
     m_id = revenue_data.get("merchant_id", "Unknown")
 
+    # Derived confidence: weighted average across upstream specialist models
+    risk_conf = float((risk_data or {}).get("confidence_score") or 75.0)
+    fc_conf = float(((forecast_data[0] if forecast_data else {})).get("confidence_score") or 75.0)
+    churn_conf = float((churn_data or {}).get("confidence_score") or 75.0)
+    derived_conf = round((risk_conf * 0.40 + fc_conf * 0.35 + churn_conf * 0.25), 1)
+
     try:
-        fallback_fn = lambda: generate_investor_grade_report(revenue_data, forecast_data, risk_data, recommendations)
+        fallback_fn = lambda: generate_investor_grade_report(revenue_data, forecast_data, risk_data, recommendations, churn_data, decision_data)
         if use_llm:
-            avg_forecast = int(
+            total_rev = float(revenue_data.get("total_revenue") or 0.0)
+            monthly_rev = round(total_rev / 3.0, 2)
+            three_m_forecast_avg = round(
                 sum(item["predicted_revenue"] for item in forecast_data) / len(forecast_data)
-            ) if forecast_data else int(revenue_data.get("total_revenue") or 0)
-            prompt = f"""Generate an investor-grade Executive Merchant Intelligence Report.
-Merchant {m_id}: GMV INR {revenue_data.get('total_revenue', 0):,.2f}, auth {revenue_data.get('success_rate', 0):.2f}%, refund {revenue_data.get('refund_rate', 0):.2f}%, risk {risk_data.get('risk_score', 0)} ({risk_data.get('risk_level')}), 3m avg INR {avg_forecast:,}. Recs: {', '.join(recommendations[:4])}.
-Sections: 1 Executive Summary 2 Revenue 3 Risk 4 Forecast 5 Recommendations 6 Decision 7 Confidence. Ground every number in telemetry. Under 400 words."""
+            , 2) if forecast_data else monthly_rev
+            churn_p = float((churn_data or {}).get("churn_probability") or 0.0)
+            final_dec = (decision_data or {}).get("final_decision") or ("APPROVE" if float(risk_data.get("risk_score", 0)) <= 35 and churn_p < 40 else ("APPROVE WITH MONITORING" if float(risk_data.get("risk_score", 0)) <= 55 else "MONITOR CLOSELY"))
+
+            prompt = f"""Generate an investor-grade Executive Merchant Intelligence Report for Merchant {m_id}.
+
+PRE-CALCULATED FINANCIAL DATA (Display these exact values directly; do NOT re-calculate or perform math):
+- 3M Aggregate Revenue: INR {total_rev:,.2f}
+- Monthly Revenue (calculated from 3-month average): INR {monthly_rev:,.2f}
+- Projected 3-Month Forecast Average: INR {three_m_forecast_avg:,.2f}
+- Payment Authorization Success Rate: {revenue_data.get('success_rate', 0):.2f}%
+- Refund Rate: {revenue_data.get('refund_rate', 0):.2f}%
+- Risk Score: {risk_data.get('risk_score', 0)} ({risk_data.get('risk_level')})
+- Churn Probability: {churn_p:.1f}%
+- Key Recommendations: {', '.join(recommendations[:4])}
+- Underwriting Decision: {final_dec}
+
+REQUIRED SECTION FORMAT:
+### 1. Executive Summary
+### 2. Revenue Insights & Throughput Velocity
+- **3M Aggregate Revenue**: INR {total_rev:,.2f}
+- **Monthly Revenue (calculated from 3-month average)**: INR {monthly_rev:,.2f}
+- **Net Realized Cashflow (Excluding Refunds)**: INR {monthly_rev * (1 - float(revenue_data.get('refund_rate', 0))/100):,.2f}
+- **Authorization Success Rate**: {revenue_data.get('success_rate', 0):.2f}%
+### 3. Risk Assessment & Fraud Exposure
+### 4. 90-Day Forecast Trajectory
+- **Projected 3-Month Forecast Average**: INR {three_m_forecast_avg:,.2f}
+### 5. Strategic Recommendations & Action Playbook
+### 6. Final Underwriting Decision
+**Decision**: {final_dec} | Derived Confidence: {derived_conf:.1f}%
+
+Under 350 words. Ground every number in the pre-calculated figures above."""
             report_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
         else:
             report_content = fallback_fn()
@@ -94,7 +144,7 @@ Sections: 1 Executive Summary 2 Revenue 3 Risk 4 Forecast 5 Recommendations 6 De
             execution_time=time.time() - start_time,
             status="SUCCESS",
             output_summary="Executive brief generated",
-            confidence=risk_data.get("confidence_score"),
+            confidence=derived_conf,
             reasoning=risk_data.get("explanation") or "",
         )
         return report_content

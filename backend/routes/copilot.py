@@ -414,6 +414,26 @@ async def stream_chat_tokens(req: ChatStreamRequest):
                 "Ground answers in this live RazorMind project and merchant ledger:\n"
                 + rag_data.get("formatted_text", "")
             )
+    else:
+        # MERCHANT Mode / Selected Merchant Context
+        if merchant_id and rag_data.get("formatted_text"):
+            system_prompt_parts.append(
+                f"### CURRENTLY SELECTED MERCHANT CONTEXT & MULTI-AGENT LEDGER\n"
+                f"Merchant ID: {merchant_id}\n\n"
+                + rag_data.get("formatted_text", "")
+                + "\n\n### CRITICAL INSTRUCTION FOR ADVISOR AI:\n"
+                + f"The user is asking about the currently selected merchant ({merchant_id}). "
+                + "You MUST answer directly citing the REAL numbers, Risk Scores, Churn %, GMV, Auth Success Rates, and Playbook recommendations from the ledger above. "
+                + "NEVER say 'I need the merchant ID or name' because you already have the complete ledger for this merchant."
+            )
+        elif merchant_id:
+            system_prompt_parts.append(
+                f"Merchant `{merchant_id}` was selected but not found in the database. Advise the user to verify the merchant ID."
+            )
+        else:
+            system_prompt_parts.append(
+                "No merchant is currently selected. Advise the user to select a merchant from the dropdown or ask a general/project question."
+            )
 
     system_context = "\n\n".join(p for p in system_prompt_parts if p)
     history_for_model = _truncate_history(past_rows)

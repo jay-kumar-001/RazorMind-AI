@@ -36,3 +36,4 @@ datasets/transactions.csv
 .idea/
 .DS_Store
 Thumbs.db
+scratch/

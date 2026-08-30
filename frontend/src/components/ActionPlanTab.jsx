@@ -4,7 +4,16 @@ import { getActionPlan } from "../api/api";
 import { CheckCircle2, Calendar, TrendingUp, ShieldCheck, PlayCircle } from "lucide-react";
 
 const cash = (v) =>
-  `₹${Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  `₹${Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+
+const formatDecimalNumbers = (text) => {
+  if (!text || typeof text !== "string") return text || "";
+  // Fix unrounded floating point strings with excessive decimal digits (e.g., 0.0000000000000000000000000000000)
+  return text.replace(/(\d+\.\d{3,})/g, (match) => {
+    const num = parseFloat(match);
+    return isNaN(num) ? match : Number(num.toFixed(2)).toString();
+  });
+};
 
 export default function ActionPlanTab({ merchant }) {
   const [plan, setPlan] = useState(null);
@@ -39,12 +48,13 @@ export default function ActionPlanTab({ merchant }) {
     );
   }
 
-  const milestones = [
+  const defaultMilestones = [
     { week: "Week 1", title: "Settlement Triage & Hard Controls", owner: "Risk Underwriter", status: "READY", items: ["Audit 3DS OTP dropoff logs", "Enable dynamic retry for soft bank declines", "Verify settlement velocity"] },
     { week: "Week 2", title: "Payment Routing & Gateway Optimization", owner: "Payment Eng", status: "SCHEDULED", items: ["Implement multi-gateway load balancing", "Activate pre-dispute early alerts", "Tune fraud detection sensitivity"] },
     { week: "Week 3", title: "Customer Retention & Churn Safeguards", owner: "Merchant Success", status: "SCHEDULED", items: ["Deploy automated re-engagement sequence", "Enable tokenized checkout retry", "Configure VIP tier incentives"] },
     { week: "Week 4", title: "Executive Audit & Underwriting Signoff", owner: "Credit Committee", status: "PLANNED", items: ["Review 30d KPI stabilization metrics", "Confirm risk tier reclassification", "Authorize revised GMV threshold"] },
   ];
+  const milestones = plan?.milestones && plan.milestones.length === 4 ? plan.milestones : defaultMilestones;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -114,7 +124,7 @@ export default function ActionPlanTab({ merchant }) {
                   {m.items.map((item, j) => (
                     <div key={j} style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: "11.5px", color: "var(--text-secondary)" }}>
                       <CheckCircle2 size={12} color="var(--emerald-text)" style={{ flexShrink: 0, marginTop: 2 }} />
-                      <span>{item}</span>
+                      <span>{formatDecimalNumbers(item)}</span>
                     </div>
                   ))}
                 </div>
@@ -149,7 +159,7 @@ export default function ActionPlanTab({ merchant }) {
               strong: ({ children }) => <strong style={{ color: "var(--text-primary)" }}>{children}</strong>,
             }}
           >
-            {plan.action_plan}
+            {formatDecimalNumbers(plan.action_plan)}
           </ReactMarkdown>
         </div>
       )}

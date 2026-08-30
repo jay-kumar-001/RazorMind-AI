@@ -116,7 +116,7 @@ export default function CopilotTab({ merchant }) {
   const [mode, setMode] = useState("merchant"); // 'merchant' | 'general'
   const [personality, setPersonality] = useState("general");
   const [models, setModels] = useState([]);
-  const [selectedModel, setSelectedModel] = useState("qwen3:8b");
+  const [selectedModel, setSelectedModel] = useState("qwen2.5:3b");
   const [ollamaStatus, setOllamaStatus] = useState("online");
   const [devMode, setDevMode] = useState(false);
 

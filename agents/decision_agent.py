@@ -53,12 +53,14 @@ def decision_agent(
                 f"Critical score {risk_score:.1f}. Hold limit expansion pending audit."
             )
 
-        confidence = float(risk.get("confidence_score") or 70.0)
+        # Derive decision confidence directly from upstream model signals (risk, forecast, churn)
+        risk_conf = float(risk.get("confidence_score") or 75.0)
+        fc_conf = float((forecast[0] if forecast else {}).get("confidence_score") or 75.0)
+        churn_conf = float((churn or {}).get("confidence_score") or 75.0)
+        confidence = round((risk_conf * 0.45 + fc_conf * 0.30 + churn_conf * 0.25), 1)
         if not forecast:
-            confidence -= 8
-        if churn_p >= 65:
-            confidence -= 5
-        confidence = round(min(97.0, max(42.0, confidence)), 1)
+            confidence = round(confidence - 6.0, 1)
+        confidence = round(min(97.0, max(45.0, confidence)), 1)
 
         result = {
             "final_decision": decision,

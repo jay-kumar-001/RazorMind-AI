@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Query
 import json
 import logging
+import time
 from backend.database import SessionLocal
 from backend.models import AgentExecution
 
 logger = logging.getLogger("razormind.traces")
 router = APIRouter(tags=["Observability"])
+
+_last_trace_times = {}
 
 
 def save_agent_trace(
@@ -19,6 +22,13 @@ def save_agent_trace(
     reasoning: str = "",
     source_metrics: dict = None,
 ):
+    now = time.time()
+    dedup_key = (str(merchant_id), str(agent_name))
+    # Cooldown deduplication: suppress duplicate back-to-back trace writes within 2.0s for the same merchant & agent
+    if dedup_key in _last_trace_times and (now - _last_trace_times[dedup_key]) < 2.0:
+        return
+    _last_trace_times[dedup_key] = now
+
     payload = {
         "input": input_query if not isinstance(input_query, dict) else input_query,
         "confidence": confidence,

@@ -211,8 +211,8 @@ export default function ForecastTab({ merchant }) {
                   {cash(f.predicted_revenue)}
                 </td>
                 <td style={{ fontFamily: "var(--font-mono)" }}>{cash(f.confidence_upper)}</td>
-                <td style={{ color: "var(--emerald-text)", fontWeight: 500, fontFamily: "var(--font-mono)" }}>
-                  +{f.trend_slope ? Number(f.trend_slope).toFixed(1) : "2.4"}%
+                <td style={{ color: (Number(f.monthly_velocity ?? f.trend_slope ?? 0) >= 0) ? "var(--emerald-text)" : "var(--rose-text)", fontWeight: 500, fontFamily: "var(--font-mono)" }}>
+                  {(Number(f.monthly_velocity ?? f.trend_slope ?? 0) >= 0 ? "+" : "") + Number(f.monthly_velocity ?? f.trend_slope ?? 0).toFixed(1)}%
                 </td>
               </tr>
             ))}

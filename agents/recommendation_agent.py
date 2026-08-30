@@ -30,13 +30,14 @@ def recommendation_agent(merchant_id: str) -> List[str]:
                 )
         unique = [r for r in dict.fromkeys(recs) if r]
         reasoning = f"{len(unique)} recs from risk={risk_data['risk_level']} churn={churn_data['churn_probability']}%"
+        rec_conf = round(float((risk_data.get("confidence_score") or 75.0) * 0.6 + (churn_data.get("confidence_score") or 75.0) * 0.4), 1)
         save_agent_trace(
             merchant_id=merchant_id,
             agent_name="Recommendation Agent",
             execution_time=time.time() - start_time,
             status="SUCCESS",
             output_summary=reasoning,
-            confidence=risk_data.get("confidence_score"),
+            confidence=rec_conf,
             reasoning=reasoning,
             source_metrics=risk_data.get("source_metrics"),
         )
