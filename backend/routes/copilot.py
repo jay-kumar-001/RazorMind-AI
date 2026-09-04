@@ -57,7 +57,10 @@ COPILOT_CORE = (
     "If data is missing, say what is missing (e.g. no analysis row, Ollama offline, empty traces) and how to obtain it. "
     "Explain pages, charts, metrics, forecasts, recommendations, risk/churn scores, roadmaps, reports, and agent results in clear English. "
     "For debug questions (blank page, failed API, chart not loading), use System debug notes and telemetry. "
-    "Keep markdown readable. Prefer short sections and bullets for executives."
+    "Keep markdown readable with clean paragraphs and bullet points. "
+    "Do NOT wrap individual numbers, metrics, risk scores, merchant IDs, or currency values in markdown backticks (`value`). "
+    "Write numbers and metrics in natural plain text or bold (e.g., **45.2/100**, **M0001**, INR 1,20,000). "
+    "Only use fenced code blocks for actual programming code or queries."
 )
 
 DEBUG_HINTS = (
@@ -421,10 +424,13 @@ async def stream_chat_tokens(req: ChatStreamRequest):
                 f"### CURRENTLY SELECTED MERCHANT CONTEXT & MULTI-AGENT LEDGER\n"
                 f"Merchant ID: {merchant_id}\n\n"
                 + rag_data.get("formatted_text", "")
-                + "\n\n### CRITICAL INSTRUCTION FOR ADVISOR AI:\n"
-                + f"The user is asking about the currently selected merchant ({merchant_id}). "
-                + "You MUST answer directly citing the REAL numbers, Risk Scores, Churn %, GMV, Auth Success Rates, and Playbook recommendations from the ledger above. "
-                + "NEVER say 'I need the merchant ID or name' because you already have the complete ledger for this merchant."
+                + "\n\n### CRITICAL INSTRUCTIONS FOR ADVISOR AI:\n"
+                + f"1. The user is asking about the currently selected merchant ({merchant_id}). "
+                + "You MUST answer directly citing the REAL numbers, exact Risk Scores, Churn %, GMV, and Auth Success Rates from the ledger above.\n"
+                + "2. Format your response in clean executive markdown paragraphs and bullet points.\n"
+                + "3. NEVER wrap data values, metrics, percentages, currency, or merchant IDs in backticks (`value`). Use plain text or bold.\n"
+                + "4. State the exact Composite Risk Score from the ledger without inventing or recalculating a different score.\n"
+                + "5. NEVER say 'I need the merchant ID or name' because you already have the complete ledger for this merchant."
             )
         elif merchant_id:
             system_prompt_parts.append(

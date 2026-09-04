@@ -24,8 +24,8 @@ def save_agent_trace(
 ):
     now = time.time()
     dedup_key = (str(merchant_id), str(agent_name))
-    # Cooldown deduplication: suppress duplicate back-to-back trace writes within 2.0s for the same merchant & agent
-    if dedup_key in _last_trace_times and (now - _last_trace_times[dedup_key]) < 2.0:
+    # Cooldown deduplication: suppress duplicate back-to-back trace writes within 4.0s for the same merchant & agent
+    if dedup_key in _last_trace_times and (now - _last_trace_times[dedup_key]) < 4.0:
         return
     _last_trace_times[dedup_key] = now
 
@@ -79,12 +79,17 @@ def get_traces(merchant_id: str, limit: int = Query(40, ge=1, le=200)):
             db.query(AgentExecution)
             .filter(AgentExecution.merchant_id == merchant_id)
             .order_by(AgentExecution.id.desc())
-            .limit(limit)
+            .limit(limit * 2)
             .all()
         )
         out = []
+        seen_consecutive = None
         for t in traces:
             parsed = _parse_input(t.input_query)
+            key = (t.agent_name, t.status, t.output_summary)
+            if key == seen_consecutive:
+                continue
+            seen_consecutive = key
             out.append({
                 "id": t.id,
                 "merchant_id": t.merchant_id,
@@ -101,9 +106,17 @@ def get_traces(merchant_id: str, limit: int = Query(40, ge=1, le=200)):
                 "reasoning": parsed.get("reasoning") or t.output_summary,
                 "source_metrics": parsed.get("source_metrics") or {},
             })
+            if len(out) >= limit:
+                break
         return out
+    except Exception as e:
+        logger.warning("Could not read agent traces from DB: %s", e)
+        return []
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 @router.get("/traces/summary")
@@ -143,5 +156,18 @@ def get_trace_analytics(merchant_id: str = Query(None)):
             "avg_confidence": round(sum(confs) / len(confs), 1) if confs else None,
             "total_agents": len(agents),
         }
+    except Exception as e:
+        logger.warning("Could not read trace summary from DB: %s", e)
+        return {
+            "total_runs": 0,
+            "success_rate": 0.0,
+            "avg_duration_ms": 0.0,
+            "total_analyses": 0,
+            "avg_confidence": None,
+            "total_agents": 0,
+        }
     finally:
-        db.close()
+        try:
+            db.close()
+        except Exception:
+            pass

@@ -196,17 +196,20 @@ class CopilotContextService:
                 debug_notes.append("No merchant bound to this thread.")
                 parts.append("### Merchant Binding\nNo merchant is currently selected. Ask user to pick a merchant or ask general questions.")
             else:
-                m = db.query(Merchant).filter(Merchant.merchant_id == merchant_id).first()
+                from backend.services.merchant_context import get_merchant_snapshot
+                m = get_merchant_snapshot(merchant_id)
+
                 if not m:
-                    debug_notes.append(f"Merchant `{merchant_id}` was not found in Postgres.")
-                    parts.append(f"### Merchant Binding\nMerchant ID `{merchant_id}` was NOT found in database.")
+                    debug_notes.append(f"Merchant {merchant_id} was not found in Postgres or CSV ledger.")
+                    parts.append(f"### Merchant Binding\nMerchant ID {merchant_id} was NOT found in database.")
                 else:
                     result["merchant_found"] = True
                     agents.extend(["Revenue Agent", "KPI & Benchmark Agent"])
                     
-                    # 1. Live Risk Calculation
+                    # 1. Live Risk Calculation & Exact Risk Score
                     live_risk = risk_service.calculate_merchant_risk(m)
-                    result["risk_score"] = live_risk.get("risk_score")
+                    exact_risk_score = float(getattr(m, "risk_score", 0.0) or live_risk.get("risk_score") or 0.0)
+                    result["risk_score"] = exact_risk_score
                     agents.append("Risk Agent")
 
                     # 2. Live Revenue Forecast
@@ -218,26 +221,34 @@ class CopilotContextService:
                     result["churn_probability"] = live_churn.get("churn_probability")
                     agents.append("Churn Agent")
 
-                    # 4. Digital Twin Simulation Baseline
+                    # 4. Digital Twin Simulation Engine
                     try:
-                        twin = simulation_service.run_simulation(m, success_rate_delta=0.0, refund_rate_delta=0.0, churn_rate_delta=0.0)
+                        twin = simulation_service.run_simulation(
+                            m,
+                            success_rate_delta=3.0,
+                            refund_rate_delta=-0.5,
+                            churn_rate_delta=-1.0,
+                            retention_delta=2.0,
+                            volume_growth_delta=5.0,
+                        )
                         agents.append("Digital Twin Agent")
                     except Exception as e:
                         twin = None
-                        debug_notes.append(f"Digital Twin baseline: {e}")
+                        debug_notes.append(f"Digital Twin simulation: {e}")
 
                     # Merchant Profile
+                    retention_val = float(getattr(m, "retention_rate", None) or getattr(m, "retention_score", 0.0) or 0.0)
                     parts.append(
                         "\n".join([
-                            f"### Live Merchant Profile — {m.merchant_id} ({m.merchant_name or 'Unknown'})",
-                            f"- Category: {m.category or 'E-Commerce'} | Industry: {m.industry or 'Retail'} | Status: {m.merchant_status or 'Active'}",
-                            f"- Total Revenue (GMV): INR {float(m.total_revenue or 0):,.2f}",
-                            f"- Total Transactions: {int(m.total_transactions or 0):,}",
-                            f"- Authorization Success Rate: {float(m.success_rate or 0):.2f}%",
-                            f"- Refund Rate: {float(m.refund_rate or 0):.2f}%",
-                            f"- Active Customers: {int(m.active_customers or 0):,} | Repeat Customers: {int(m.repeat_customers or 0):,}",
-                            f"- Customer Retention Score: {float(m.retention_score or 0):.2f}% | Average Order Value (AOV): INR {float(m.avg_order_value or 0):,.2f}",
-                            f"- Merchant Health Score: {float(m.merchant_health_score or 0):.1f}/100",
+                            f"### Live Merchant Profile — {m.merchant_id} ({getattr(m, 'merchant_name', None) or 'Unknown'})",
+                            f"- Category: {getattr(m, 'category', 'E-Commerce') or 'E-Commerce'} | Industry: {getattr(m, 'industry', 'Retail') or 'Retail'} | Status: {getattr(m, 'merchant_status', 'ACTIVE') or 'ACTIVE'}",
+                            f"- Total Revenue (GMV): INR {float(getattr(m, 'total_revenue', 0) or 0):,.2f}",
+                            f"- Total Transactions: {int(getattr(m, 'total_transactions', 0) or 0):,}",
+                            f"- Authorization Success Rate: {float(getattr(m, 'success_rate', 0) or 0):.2f}%",
+                            f"- Refund Rate: {float(getattr(m, 'refund_rate', 0) or 0):.2f}%",
+                            f"- Active Customers: {int(getattr(m, 'active_customers', 0) or 0):,} | Repeat Customers: {int(getattr(m, 'repeat_customers', 0) or 0):,}",
+                            f"- Customer Retention: {retention_val:.1f}% | Average Order Value (AOV): INR {float(getattr(m, 'avg_order_value', 0) or 0):,.2f}",
+                            f"- Merchant Health Score: {float(getattr(m, 'merchant_health_score', 0) or 0):.1f}/100",
                         ])
                     )
 
@@ -246,7 +257,7 @@ class CopilotContextService:
                     parts.append(
                         "\n".join([
                             "### Risk Assessment (Risk Agent)",
-                            f"- Composite Risk Score: {live_risk.get('risk_score')}/100 — Level: `{live_risk.get('risk_level')}` (Severity: {live_risk.get('severity')})",
+                            f"- Exact Composite Risk Score: {exact_risk_score:.1f}/100 — Level: {live_risk.get('risk_level')} (Severity: {live_risk.get('severity')})",
                             "- Risk Factor Weights: Payment Failure Risk 35%, Dispute & Chargeback Risk 25%, Volatility & Retention Risk 20%, Predictive Churn Risk 20%",
                             f"- Primary Risk Drivers: {risk_factors_str}",
                         ])
@@ -256,7 +267,7 @@ class CopilotContextService:
                     parts.append(
                         "\n".join([
                             "### Churn Prediction (Churn Agent)",
-                            f"- Churn Probability: {live_churn.get('churn_probability')}% — Risk Level: `{live_churn.get('churn_risk_level')}` ({live_churn.get('urgency')})",
+                            f"- Churn Probability: {live_churn.get('churn_probability')}% — Risk Level: {live_churn.get('churn_risk_level')} ({live_churn.get('urgency')})",
                             f"- Key Drivers: {'; '.join(live_churn.get('key_drivers') or ['Stable customer retention'])}",
                             f"- Recommended Playbook: {live_churn.get('recommended_playbook', 'Standard account management')}",
                         ])
@@ -284,7 +295,7 @@ class CopilotContextService:
                         parts.append(
                             "\n".join([
                                 "### Multi-Agent Governance & Decision",
-                                f"- Underwriting Decision: `{analysis.decision}` | Risk Level: `{analysis.risk_level}` (Score: {analysis.risk_score})",
+                                f"- Underwriting Decision: {analysis.decision} | Risk Level: {analysis.risk_level} (Score: {exact_risk_score:.1f}/100)",
                                 f"- Executive Brief Summary:\n{_clip(analysis.executive_report, 1200)}",
                             ])
                         )
@@ -310,10 +321,26 @@ class CopilotContextService:
                             else:
                                 parts.append(f"### Recommendations:\n{_clip(str(recs), 600)}")
 
-                    # Digital Twin Baseline
-                    if twin:
-                        sim_summary = {k: twin[k] for k in ["baseline_revenue", "simulated_revenue", "revenue_growth_percent", "net_gain"] if k in twin}
-                        parts.append(f"### Digital Twin Baseline (Simulation Engine)\n- Metrics: {json.dumps(sim_summary, default=str)}")
+                    # Digital Twin Simulation Intelligence (simulation_service.py)
+                    if twin and "simulated" in twin and "baseline" in twin:
+                        sim_rev = float(twin["simulated"]["revenue"])
+                        base_rev = float(twin["baseline"]["revenue"])
+                        rev_lift_pct = float(twin["simulated"]["revenue_growth_percent"])
+                        rev_lift_diff = float(twin["simulated"]["revenue_difference"])
+                        sim_health = float(twin["simulated"]["health_score"])
+                        sim_risk = float(twin["simulated"]["risk_score"])
+                        parts.append(
+                            "\n".join([
+                                "### Digital Twin Simulation Engine (simulation_service.py — Fully Operational)",
+                                "- Engine Status: Fully Operational (elasticity_twin_v2 historical elasticity model).",
+                                f"- Baseline Gross Volume: INR {base_rev:,.2f} | Baseline Auth: {float(twin['baseline']['success_rate']):.2f}% | Baseline Refund: {float(twin['baseline']['refund_rate']):.2f}%",
+                                "- Gateway Optimization What-If Scenario (+3.0% Auth Lift, -0.5% Refund Reduction, +2.0% Retention, +5.0% Volume Growth):",
+                                f"  * Projected Simulated Revenue: INR {sim_rev:,.2f} (+{rev_lift_pct:.2f}% expansion / +INR {rev_lift_diff:,.2f} annual GMV lift)",
+                                f"  * Projected Health Score Lift: {sim_health:.1f}/100 (Status: {twin['simulated']['status']})",
+                                f"  * Projected Risk Score Recalibration: {sim_risk:.1f}/100 ({twin['simulated']['risk_level']} Risk)",
+                                f"  * Simulation Insights: {'; '.join(twin.get('impact_summary', [])) or 'Operational parameters converged successfully.'}",
+                            ])
+                        )
 
                     # Dynamic Genuine Consulted Agents selection
                     q_low = (query or "").lower()
@@ -336,7 +363,7 @@ class CopilotContextService:
                         consulted.extend(["Risk Agent", "Revenue Agent"])
                     else:
                         # Broad merchant overview query (e.g. "What is happening with this merchant?")
-                        consulted.extend(["Risk Agent", "Churn Agent", "Forecast Agent", "Revenue Agent"])
+                        consulted.extend(["Risk Agent", "Churn Agent", "Forecast Agent", "Revenue Agent", "Digital Twin Agent"])
                         if analysis:
                             consulted.append("Decision Center Agent")
                     agents = consulted

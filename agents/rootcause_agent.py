@@ -95,9 +95,17 @@ def rootcause_agent(merchant_id: str) -> Dict[str, Any]:
                 "estimated_revenue_loss": 0.0,
             })
 
+        severity_order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2}
+        diagnosed_issues.sort(
+            key=lambda x: (
+                severity_order.get(str(x.get("severity", "LOW")).upper(), 3),
+                -float(x.get("estimated_revenue_loss", 0.0) or 0.0),
+            )
+        )
+
         primary = diagnosed_issues[0]
         # Genuine diagnostic confidence derived from evidence strength, severity, and anomaly count
-        issue_count = len([d for d in diagnosed_issues if d["severity"] != "LOW"])
+        issue_count = len([d for d in diagnosed_issues if d.get("severity") != "LOW"])
         severity_bonus = 12.0 if primary["severity"] == "HIGH" else (7.0 if primary["severity"] == "MEDIUM" else 2.0)
         conf = round(min(96.0, max(56.0, 70.0 + severity_bonus + min(8.0, issue_count * 3.0) + (4.0 if rev > 100000 else 0.0))), 1)
 

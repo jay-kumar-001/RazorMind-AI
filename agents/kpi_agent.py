@@ -34,7 +34,7 @@ def kpi_agent(merchant_id: str) -> Dict[str, Any]:
         rev = float(getattr(merchant, "total_revenue", 0.0) or 0.0)
         succ = float(getattr(merchant, "success_rate", 0.0) or 0.0)
         ref = float(getattr(merchant, "refund_rate", 0.0) or 0.0)
-        ret = float(getattr(merchant, "retention_score", 0.0) or 0.0)
+        ret = float(getattr(merchant, "retention_rate", None) or getattr(merchant, "retention_score", 0.0) or 0.0)
         health = float(getattr(merchant, "merchant_health_score", 0.0) or 0.0)
         cat = str(getattr(merchant, "category", "E-Commerce") or "E-Commerce")
         tx = int(getattr(merchant, "total_transactions", 0) or 0)

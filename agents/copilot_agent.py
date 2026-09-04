@@ -27,7 +27,7 @@ def generate_copilot_fallback(merchant_info: dict, question: str) -> str:
     if any(k in q_lower for k in ["risk", "danger", "fraud", "safe", "threat", "failure"]):
         return (
             f"### Risk Intelligence for {m_id}\n\n"
-            f"- **Current Risk Level**: `{risk_level}` (Health Score: {health:.1f}/100)\n"
+            f"- **Current Risk Level**: **{risk_level}** (Health Score: {health:.1f}/100)\n"
             f"- **Authorization Success**: {success:.1f}% ({'Optimal' if success >= 92 else 'Underperforming — soft decline exposure'})\n"
             f"- **Refund & Dispute Velocity**: {refund:.1f}% ({'Healthy' if refund <= 2 else 'Elevated — potential chargeback drag'})\n"
             f"- **Risk Mitigation**: Recommend enabling dynamic retry policies and 3DS adaptive friction controls."
@@ -41,16 +41,17 @@ def generate_copilot_fallback(merchant_info: dict, question: str) -> str:
             f"- **Growth Opportunity**: Improving payment authorization by +3% would yield approximately INR {(revenue * 0.035):,.0f}/month in captured revenue."
         )
     elif any(k in q_lower for k in ["recommend", "action", "improve", "do", "strategy", "roadmap"]):
+        ret_display = float(merchant_info.get('retention_rate', merchant_info.get('retention_score', 48.6)) or 48.6)
         return (
             f"### Strategic Action Items for {m_id}\n\n"
             f"1. **Deploy Dynamic Payment Routing**: Minimize gateway timeouts and route to top-performing card acquirers.\n"
             f"2. **Chargeback Prevention Alerts**: Integrate real-time pre-dispute notifications to arrest rising refund rates.\n"
-            f"3. **Customer Re-engagement**: Boost repeat customer retention ({merchant_info.get('retention_score', 25):.1f}%) through tokenized checkout incentives."
+            f"3. **Customer Re-engagement**: Boost repeat customer retention ({ret_display:.1f}%) through tokenized checkout incentives."
         )
     elif any(k in q_lower for k in ["decision", "why", "status", "approve", "review"]):
         return (
             f"### Underwriting Decision Rationale for {m_id}\n\n"
-            f"- **Final System Decision**: `{decision}`\n"
+            f"- **Final System Decision**: **{decision}**\n"
             f"- **Underwriting Score**: {health:.1f}/100\n"
             f"- **Core Justification**: Merchant exhibits {risk_level.lower()} risk fundamentals with a {success:.1f}% authorization rate and INR {revenue:,.0f} aggregate throughput.\n"
             f"- **Supervision Policy**: Maintain standard quarterly health audits and automated dispute alerts."
@@ -58,7 +59,7 @@ def generate_copilot_fallback(merchant_info: dict, question: str) -> str:
     else:
         return (
             f"### Merchant Summary for {m_id}\n\n"
-            f"- **Portfolio Status**: {merchant_info.get('merchant_status', 'Healthy')} | **Decision**: `{decision}`\n"
+            f"- **Portfolio Status**: {merchant_info.get('merchant_status', 'Healthy')} | **Decision**: **{decision}**\n"
             f"- **Key Metrics**: Revenue: INR {revenue:,.0f} | Success Rate: {success:.1f}% | Refund Rate: {refund:.1f}%\n"
             f"- **Health Index**: {health:.1f}/100 ({risk_level} Risk)\n"
             f"- **Key Focus**: Focus on transaction retry optimization and customer retention."
@@ -90,6 +91,7 @@ def copilot_agent(merchant_id: str, question: str) -> str:
         risk_data = risk_service.calculate_merchant_risk(merchant)
         forecast_data = forecast_service.generate_forecast(merchant, months_ahead=3)
 
+        retention_val = float(getattr(merchant, "retention_rate", None) or getattr(merchant, "retention_score", 0.0) or 0.0)
         merchant_context = {
             "merchant_id": merchant_id,
             "merchant_name": getattr(merchant, "merchant_name", merchant_id),
@@ -97,7 +99,8 @@ def copilot_agent(merchant_id: str, question: str) -> str:
             "total_revenue": float(getattr(merchant, "total_revenue", 0.0) or 0.0),
             "success_rate": float(getattr(merchant, "success_rate", 0.0) or 0.0),
             "refund_rate": float(getattr(merchant, "refund_rate", 0.0) or 0.0),
-            "retention_score": float(getattr(merchant, "retention_score", 0.0) or 0.0),
+            "retention_score": retention_val,
+            "retention_rate": retention_val,
             "merchant_health_score": float(getattr(merchant, "merchant_health_score", 0.0) or 0.0),
             "risk_score": risk_data["risk_score"],
             "risk_level": risk_data["risk_level"],
@@ -116,7 +119,7 @@ Merchant Profile Context:
 - Monthly Revenue: INR {merchant_context['total_revenue']:,.2f}
 - Payment Success Rate: {merchant_context['success_rate']:.2f}%
 - Refund Rate: {merchant_context['refund_rate']:.2f}%
-- Customer Retention Score: {merchant_context['retention_score']:.2f}%
+- Customer Retention Rate: {merchant_context['retention_rate']:.1f}%
 - Merchant Health Score: {merchant_context['merchant_health_score']:.2f}/100
 - Risk Score: {merchant_context['risk_score']:.1f}/100 (Level: {merchant_context['risk_level']})
 - Current Underwriting Decision: {merchant_context['decision']}
@@ -126,8 +129,10 @@ User Question:
 "{question}"
 
 Instructions:
-- Provide a clear, actionable, professional executive response in markdown.
+- Provide a clear, actionable, professional executive response in markdown paragraphs and lists.
 - Ground your answer specifically in the provided merchant numbers.
+- Do NOT wrap numbers, metrics, merchant IDs, risk scores, currency amounts, or percentages in markdown code backticks (e.g. write **45.2/100**, **M0001**, INR 10,25,351 instead of `45.2` or `M0001`). Use plain text or bold markdown.
+- Never create single-value isolated code blocks.
 - Highlight risk nuances, growth opportunities, and recommendations.
 - Keep the tone comparable to Stripe Radar, Razorpay, or McKinsey Payments.
 - Under 250 words.

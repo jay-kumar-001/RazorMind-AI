@@ -8,8 +8,9 @@ class RiskService:
     @staticmethod
     def calculate_merchant_risk(merchant: Any) -> Dict[str, Any]:
         mid = str(getattr(merchant, "merchant_id", "unknown"))
+        recorded_risk = float(getattr(merchant, "risk_score", 0.0) or 0.0)
         cache_key = (
-            f"{mid}:{getattr(merchant, 'success_rate', 0)}:"
+            f"{mid}:{recorded_risk}:{getattr(merchant, 'success_rate', 0)}:"
             f"{getattr(merchant, 'refund_rate', 0)}:{getattr(merchant, 'merchant_health_score', 0)}:"
             f"{getattr(merchant, 'retention_score', 0)}"
         )
@@ -20,7 +21,7 @@ class RiskService:
         success_rate = float(getattr(merchant, "success_rate", 0.0) or 0.0)
         refund_rate = float(getattr(merchant, "refund_rate", 0.0) or 0.0)
         chargeback_rate = float(getattr(merchant, "chargeback_rate", 0.0) or 0.0)
-        retention_score = float(getattr(merchant, "retention_score", 0.0) or 0.0)
+        retention_score = float(getattr(merchant, "retention_rate", None) or getattr(merchant, "retention_score", 0.0) or 0.0)
         total_revenue = float(getattr(merchant, "total_revenue", 0.0) or 0.0)
         health_score = float(getattr(merchant, "merchant_health_score", 0.0) or 0.0)
         total_transactions = int(getattr(merchant, "total_transactions", 0) or 0)
@@ -116,7 +117,7 @@ class RiskService:
         top_driver = max(breakdown, key=breakdown.get)
         explanation = (
             f"Weighted score {final_risk:.1f}/100 ({risk_level}). "
-            f"Largest contributor: {top_driver} = {breakdown[top_driver]:.1f}. "
+            f"Largest macro risk contributor: {top_driver} = {breakdown[top_driver]:.1f}. "
             f"Auth {success_rate:.1f}%, refund {refund_rate:.1f}%, chargeback {chargeback_rate:.2f}%, churn {predictive_churn_risk:.1f}%."
         )
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { runSimulation } from "../api/api";
-import { Sliders, RefreshCw, Zap, TrendingUp, CheckCircle, ArrowRight } from "lucide-react";
+import { RefreshCw, Info } from "lucide-react";
 
 const cash = (v) =>
   `₹${Number(v || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -43,7 +43,7 @@ export default function DigitalTwinTab({ merchant }) {
     try {
       const res = await runSimulation({ merchant_id: mid, ...sliders });
       setResult(res.data);
-    } catch (e) {
+    } catch {
       setError("Simulation model failed to converge. Please try again.");
     } finally {
       setLoading(false);
@@ -137,6 +137,10 @@ export default function DigitalTwinTab({ merchant }) {
             <div>
               <div className="eyebrow">Simulated Outcome Ledger</div>
               <div className="panel-title">Projected Impact on Merchant Portfolio</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "11px", color: "var(--text-tertiary)", marginTop: 3 }}>
+                <Info size={11} color="var(--accent-text)" />
+                <span>Methodology: Projections modeled via historical elasticity simulation (<code>elasticity_twin_v2</code>) incorporating auth lift elasticity, dispute recovery, and retention compounding.</span>
+              </div>
             </div>
             {result && <span className="tag tag-low">CONVERGED MODEL</span>}
           </div>

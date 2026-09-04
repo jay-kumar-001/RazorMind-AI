@@ -558,13 +558,26 @@ export default function CopilotTab({ merchant }) {
         </table>
       </div>
     ),
-    code({ inline, className, children, ...props }) {
+    code({ node, inline, className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || "");
       const lang = match ? match[1].toLowerCase() : "code";
       const codeString = String(children).replace(/\n$/, "");
+      const isMultiLine = codeString.includes("\n");
+      const isShort = codeString.length < 80 && !isMultiLine;
+      const isExplicitBlock = Boolean(match);
+
+      // Render as inline code chip if marked inline, or if short/single-line without explicit language block
+      if (inline || (!isMultiLine && !isExplicitBlock) || isShort) {
+        return (
+          <code className="chat-inline-code" {...props}>
+            {children}
+          </code>
+        );
+      }
+
       const codeKey = `${lang}-${codeString.slice(0, 20)}`;
 
-      return !inline ? (
+      return (
         <div className="chat-code-block">
           <div className="chat-code-header">
             <span className="chat-code-lang">{lang.toUpperCase()}</span>
@@ -590,10 +603,6 @@ export default function CopilotTab({ merchant }) {
             <code>{children}</code>
           </pre>
         </div>
-      ) : (
-        <code className="chat-inline-code" {...props}>
-          {children}
-        </code>
       );
     },
   };

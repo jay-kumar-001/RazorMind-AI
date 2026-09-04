@@ -82,9 +82,12 @@ def _orm_to_namespace(m: Merchant, csv_row: Optional[Any] = None) -> SimpleNames
     if csv_row is not None:
         extra = _row_to_namespace(csv_row)
         ns.chargeback_rate = extra.chargeback_rate
-        ns.retention_rate = extra.retention_rate
-        if ns.retention_score in (0.0, 25.0) and extra.retention_rate:
+        if extra.retention_rate:
+            ns.retention_rate = extra.retention_rate
             ns.retention_score = extra.retention_rate
+        elif extra.retention_score:
+            ns.retention_rate = extra.retention_score
+            ns.retention_score = extra.retention_score
         if not ns.repeat_customers and extra.repeat_customers:
             ns.repeat_customers = extra.repeat_customers
         ns.data_source = "postgres+csv"
