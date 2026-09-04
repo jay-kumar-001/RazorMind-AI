@@ -21,7 +21,7 @@ class LLMService:
             self._llm = ChatOllama(
                 model=self.ollama_model,
                 temperature=0.2,
-                timeout=4.0
+                timeout=3.0
             )
         except Exception as e:
             logger.warning(f"Could not initialize ChatOllama: {e}")

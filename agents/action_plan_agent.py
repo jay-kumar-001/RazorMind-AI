@@ -83,11 +83,34 @@ def action_plan_agent(
         lift = _auth_gap_lift(merchant_dict)
         fallback_fn = lambda: generate_dynamic_action_plan(merchant_dict, risk_data, recs)
         if use_llm:
-            prompt = f"""Write a 30-day tactical merchant action plan for merchant {merchant_id}.
-Revenue INR {merchant_dict['total_revenue']:,.0f}, auth {merchant_dict['success_rate']:.2f}%, refund {merchant_dict['refund_rate']:.2f}%, health {merchant_dict['merchant_health_score']:.1f}, risk {risk_data['risk_level']} ({risk_data['risk_score']}).
-Recs: {', '.join(recs[:3])}.
-MANDATORY STRUCTURE: Exactly 4 weekly milestones (Week 1, Week 2, Week 3, Week 4) for a 30-day timeline. Do NOT generate any Week 5 or Week 6.
-Quantify lift from the {max(0, 94 - merchant_dict['success_rate']):.1f}pp auth gap (est. INR {lift:,.0f}/mo). Under 350 words."""
+            prompt = f"""Write a detailed 30-day tactical merchant action plan for Merchant {merchant_id}.
+
+MERCHANT DATA (use these exact numbers — do NOT invent):
+- Total Revenue: INR {merchant_dict['total_revenue']:,.0f} | Monthly Avg: INR {merchant_dict['total_revenue']/3:,.0f}
+- Auth Success Rate: {merchant_dict['success_rate']:.1f}% (gap to 94% benchmark: {max(0, 94 - merchant_dict['success_rate']):.1f}pp → est. revenue lift INR {lift:,.0f}/mo)
+- Refund Rate: {merchant_dict['refund_rate']:.1f}% | Health Score: {merchant_dict['merchant_health_score']:.1f}/100
+- Risk Level: {risk_data['risk_level']} | Risk Score: {risk_data['risk_score']}
+- Priority Recommendations: {', '.join(recs[:3])}
+
+REQUIRED FORMAT — exactly 4 weeks, 3 action bullets each:
+#### Week 1: Routing & Decline Triage
+- [specific action citing auth rate]
+- [specific action citing top rec 1]
+- Milestone: close X pp of auth gap
+#### Week 2: Refund & Dispute Control
+- [specific action citing refund rate]
+- [specific action citing top rec 2]
+- Milestone: target refund ≤ X%
+#### Week 3: Retention & Checkout Acceleration
+- [specific actions]
+- Milestone: retention and conversion improvements
+#### Week 4: Risk Recalibration & Signoff
+- Re-run risk scorecard vs day-0 baseline
+- Review underwriting tier eligibility
+- Milestone: confirm risk score movement
+
+**Expected Outcome**: +INR {lift:,.0f}/mo revenue lift. Target auth rate {min(99.0, merchant_dict['success_rate'] + min(2.5, max(0, 94 - merchant_dict['success_rate']))):.1f}%.
+Under 220 words. No generic advice — cite specific merchant numbers throughout."""
             plan_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
         else:
             plan_content = fallback_fn()

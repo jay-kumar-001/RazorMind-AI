@@ -106,34 +106,46 @@ def executive_report_agent(
             churn_p = float((churn_data or {}).get("churn_probability") or 0.0)
             final_dec = (decision_data or {}).get("final_decision") or ("APPROVE" if float(risk_data.get("risk_score", 0)) <= 35 and churn_p < 40 else ("APPROVE WITH MONITORING" if float(risk_data.get("risk_score", 0)) <= 55 else "MONITOR CLOSELY"))
 
-            prompt = f"""Generate an investor-grade Executive Merchant Intelligence Report for Merchant {m_id}.
+            prompt = f"""Generate a professional Executive Merchant Intelligence Report for Merchant {m_id}.
 
-PRE-CALCULATED FINANCIAL DATA (Display these exact values directly; do NOT re-calculate or perform math):
-- 3M Aggregate Revenue: INR {total_rev:,.2f}
-- Monthly Revenue (calculated from 3-month average): INR {monthly_rev:,.2f}
-- Projected 3-Month Forecast Average: INR {three_m_forecast_avg:,.2f}
-- Payment Authorization Success Rate: {revenue_data.get('success_rate', 0):.2f}%
-- Refund Rate: {revenue_data.get('refund_rate', 0):.2f}%
-- Risk Score: {risk_data.get('risk_score', 0)} ({risk_data.get('risk_level')})
-- Churn Probability: {churn_p:.1f}%
-- Key Recommendations: {', '.join(recommendations[:4])}
+USE ONLY THESE EXACT FIGURES (do NOT recalculate or invent numbers):
+- 3M Revenue: INR {total_rev:,.2f} | Monthly Avg: INR {monthly_rev:,.2f}
+- Net Cashflow (excl. refunds): INR {monthly_rev * (1 - float(revenue_data.get('refund_rate', 0))/100):,.2f}
+- Auth Success Rate: {revenue_data.get('success_rate', 0):.2f}% | Refund Rate: {revenue_data.get('refund_rate', 0):.2f}%
+- Avg Order Value: INR {float(revenue_data.get('avg_order_value') or 0):,.2f}
+- Risk Score: {risk_data.get('risk_score', 0):.1f}/100 ({risk_data.get('risk_level', 'N/A')})
+- Churn Probability: {churn_p:.1f}% | Confidence: {derived_conf:.1f}%
+- Forecast 3M Avg: INR {three_m_forecast_avg:,.2f}
+- Key Recs: {', '.join(recommendations[:3])}
 - Underwriting Decision: {final_dec}
 
-REQUIRED SECTION FORMAT:
+REQUIRED SECTIONS WITH THIS FORMAT:
 ### 1. Executive Summary
-### 2. Revenue Insights & Throughput Velocity
-- **3M Aggregate Revenue**: INR {total_rev:,.2f}
-- **Monthly Revenue (calculated from 3-month average)**: INR {monthly_rev:,.2f}
-- **Net Realized Cashflow (Excluding Refunds)**: INR {monthly_rev * (1 - float(revenue_data.get('refund_rate', 0))/100):,.2f}
-- **Authorization Success Rate**: {revenue_data.get('success_rate', 0):.2f}%
-### 3. Risk Assessment & Fraud Exposure
-### 4. 90-Day Forecast Trajectory
-- **Projected 3-Month Forecast Average**: INR {three_m_forecast_avg:,.2f}
-### 5. Strategic Recommendations & Action Playbook
-### 6. Final Underwriting Decision
-**Decision**: {final_dec} | Derived Confidence: {derived_conf:.1f}%
+2-3 sentences on overall merchant health, risk posture, and decision.
 
-Under 350 words. Ground every number in the pre-calculated figures above."""
+### 2. Revenue & Throughput Velocity
+- **3M Aggregate Revenue**: INR {total_rev:,.2f}
+- **Monthly Revenue**: INR {monthly_rev:,.2f}
+- **Net Cashflow (excl. refunds)**: INR {monthly_rev * (1 - float(revenue_data.get('refund_rate', 0))/100):,.2f}
+- **Auth Success Rate**: {revenue_data.get('success_rate', 0):.2f}% — note if optimal (≥92%) or needs improvement
+- **AOV**: INR {float(revenue_data.get('avg_order_value') or 0):,.2f}
+
+### 3. Risk Assessment & Fraud Exposure
+2-3 sentences covering risk score, churn probability, refund rate vs 2% ceiling, and key risk explanation.
+
+### 4. 90-Day Growth Forecast
+- **Projected 3M Avg Revenue**: INR {three_m_forecast_avg:,.2f}
+1 sentence on trajectory trend.
+
+### 5. Strategic Recommendations
+List top 3 recommendations as bullet points with brief rationale each.
+
+### 6. Underwriting Decision
+**Decision**: {final_dec}
+- **Derived Committee Confidence**: {derived_conf:.1f}%
+- Settlement Terms, supervision frequency, one-line rationale.
+
+Under 280 words. Use bold for all metrics. No backticks around numbers or IDs."""
             report_content = llm_service.generate(prompt=prompt, fallback_generator=fallback_fn)
         else:
             report_content = fallback_fn()

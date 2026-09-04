@@ -80,7 +80,7 @@ class OllamaStreamingService:
             "model": active_model,
             "messages": messages,
             "stream": True,
-            "options": {"temperature": 0.2, "num_ctx": 4096, "num_predict": 450},
+            "options": {"temperature": 0.2, "num_ctx": 2048, "num_predict": 300},
         }
         url = f"{self.base_url}/api/chat"
         start_time = time.time()
